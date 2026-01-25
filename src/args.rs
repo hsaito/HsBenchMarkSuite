@@ -215,7 +215,11 @@ mod tests {
     #[test]
     fn test_block_size_default() {
         let args = BenchmarkArgs::default();
-        assert_eq!(args.block_size, 512 * 1024, "Default block size should be 512 KB");
+        assert_eq!(
+            args.block_size,
+            512 * 1024,
+            "Default block size should be 512 KB"
+        );
     }
 
     #[test]
