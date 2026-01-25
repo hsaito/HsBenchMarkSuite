@@ -25,5 +25,7 @@ Thumbs.db
 # Benchmark temp files
 .bench_temp/
 .bench_test_*.tmp
+output_*.csv
+output_*.json
 output.csv
 output.json

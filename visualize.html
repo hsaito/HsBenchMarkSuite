@@ -161,10 +161,16 @@
             margin-top: 40px;
         }
         
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
         .chart-container {
             position: relative;
             height: 400px;
-            margin-bottom: 40px;
             background: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
@@ -291,7 +297,7 @@
         ];
 
         const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
+        let fileInput = document.getElementById('fileInput');
 
         // Handle drag and drop
         dropZone.addEventListener('dragover', (e) => {
@@ -309,13 +315,14 @@
             handleFiles(e.dataTransfer.files);
         });
 
-        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('click', () => {
+            // Use current fileInput reference, not the one captured in closure
+            document.getElementById('fileInput').click();
+        });
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
         function handleFiles(files) {
-            loadedData = [];
-            document.getElementById('fileList').innerHTML = '';
-            
+            // Append new files instead of replacing existing ones
             for (const file of files) {
                 if (file.type === 'application/json') {
                     const reader = new FileReader();
@@ -337,11 +344,18 @@
                     reader.readAsText(file);
                 }
             }
+            
+            // Reset file input value so the same files can be selected again
+            document.getElementById('fileInput').value = '';
         }
 
         function renderFileList() {
             const fileListDiv = document.getElementById('fileList');
-            if (loadedData.length === 0) return;
+            
+            if (loadedData.length === 0) {
+                fileListDiv.innerHTML = '';
+                return;
+            }
 
             let html = '<div class="file-list"><h3>Loaded Files (' + loadedData.length + ')</h3>';
             loadedData.forEach((item, idx) => {
@@ -437,33 +451,31 @@
             const selectedMetric = document.getElementById('metricSelect').value;
             const metrics = selectedMetric ? [selectedMetric] : getAllMetrics();
 
+            // Create a grid container for all charts
+            const chartsGrid = document.createElement('div');
+            chartsGrid.className = 'charts-grid';
+            container.appendChild(chartsGrid);
+
             metrics.forEach(metric => {
                 const chartDiv = document.createElement('div');
                 chartDiv.className = 'chart-container';
-                container.appendChild(chartDiv);
+                chartsGrid.appendChild(chartDiv);
 
-                const labels = loadedData.map(d => `${d.hostname}\n${new Date(d.timestamp).toLocaleDateString()}`);
-                const datasets = [];
-                const values = [];
-
-                loadedData.forEach((item, idx) => {
-                    const val = getMetricValue(item.data, metric);
-                    if (val !== null) {
-                        values.push(val);
-                        datasets.push({
-                            label: item.hostname,
-                            data: [val],
-                            backgroundColor: colors[idx % colors.length],
-                            borderColor: colors[idx % colors.length],
-                            borderWidth: 2
-                        });
-                    }
+                // Create labels with hostname and timestamp
+                const labels = loadedData.map(d => {
+                    const date = new Date(d.timestamp);
+                    return `${d.hostname}\n${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
                 });
 
-                if (datasets.length === 0) return;
+                // Collect all values for this metric from all files
+                const values = [];
+                loadedData.forEach((item, idx) => {
+                    const val = getMetricValue(item.data, metric);
+                    values.push(val !== null ? val : 0);
+                });
 
-                const ctx = chartDiv.querySelector('canvas');
-                if (ctx) ctx.remove();
+                if (values.every(v => v === 0)) return;
+
                 const canvas = document.createElement('canvas');
                 chartDiv.appendChild(canvas);
 
@@ -476,7 +488,13 @@
                     type: 'bar',
                     data: {
                         labels: labels,
-                        datasets: datasets
+                        datasets: [{
+                            label: metric,
+                            data: values,
+                            backgroundColor: values.map((_, idx) => colors[idx % colors.length]),
+                            borderColor: values.map((_, idx) => colors[idx % colors.length]),
+                            borderWidth: 2
+                        }]
                     },
                     options: {
                         responsive: true,
@@ -488,11 +506,7 @@
                         },
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Value'
-                                }
+                                beginAtZero: true
                             }
                         }
                     }
@@ -531,15 +545,37 @@
             document.getElementById('chartsSection').innerHTML = '';
             document.getElementById('metricSelect').innerHTML = '<option value="">-- All Metrics --</option>';
             document.getElementById('status').innerHTML = '';
-            fileInput.value = '';
+            
+            // Recreate file input element to ensure it's in a clean state
+            const oldFileInput = fileInput;
+            const newFileInput = document.createElement('input');
+            newFileInput.type = 'file';
+            newFileInput.id = 'fileInput';
+            newFileInput.multiple = true;
+            newFileInput.accept = '.json';
+            newFileInput.style.display = 'none';
+            oldFileInput.parentNode.replaceChild(newFileInput, oldFileInput);
+            fileInput = newFileInput;
+            
+            // Re-attach change event listener to new file input
+            fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
         }
 
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status');
+            if (!message || message.trim() === '') {
+                statusDiv.innerHTML = '';
+                statusDiv.style.display = 'none';
+                return;
+            }
             statusDiv.className = `status ${type}`;
             statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
             setTimeout(() => {
-                if (type === 'success') statusDiv.innerHTML = '';
+                if (type === 'success') {
+                    statusDiv.innerHTML = '';
+                    statusDiv.style.display = 'none';
+                }
             }, 3000);
         }
 
