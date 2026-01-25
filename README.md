@@ -179,6 +179,83 @@ Example JSON structure:
 }
 ```
 
+## Example Output and Interpretation
+
+### Console Output Example
+
+```
+DISCLAIMER: Benchmark Results vs Actual System Capability
+These results reflect runtime metrics for synthetic test scenarios
+and do NOT necessarily equate to actual system capability for
+real-world workloads. Use these results as one of many data points,
+not as the sole basis for system evaluation.
+
+=== System Information ===
+CPU: Intel Core i7-9700K
+Physical Cores: 8
+Logical Cores: 8
+Total Memory: 32768 MB
+OS: Windows 10 Build 19045
+
+=== Benchmark Configuration ===
+Scale: 1.0
+Runs: 3
+Threads: 4
+
+--- Run 1 ---
+Running CPU Benchmark...
+CPU Primes:              12500 primes/sec
+CPU Matrix Mult (1T):    2.45 GFLOPS
+CPU Matrix Mult (4T):    8.12 GFLOPS
+CPU Speedup (4T):        3.32x
+CPU Mandelbrot:          2500000 pixels/sec
+CPU FFT:                 150 Msamples/sec
+Duration: 2.34s
+
+Running Memory Benchmark...
+Memory Write: 12500.50 MB/s
+Memory Read:  15000.25 MB/s
+Memory Avg:   13750.38 MB/s
+Duration: 0.52s
+
+Running Disk Benchmark...
+Disk Write: 450.75 MB/s
+Disk Read:  520.25 MB/s
+Disk Avg:   485.50 MB/s
+Duration: 1.08s
+```
+
+### How to Interpret Results
+
+**CPU Metrics:**
+- **Primes/sec**: Higher is better. Measures raw computational throughput. Sensitive to CPU frequency and instruction-level parallelism.
+- **GFLOPS (Giga Floating-Point Operations/Second)**: Higher is better. Matrix multiplication performance; single-threaded vs multi-threaded shows parallelization efficiency.
+- **Speedup Ratio**: Shows how effectively your system uses multiple cores. A value close to the thread count indicates good scaling; lower values suggest memory bandwidth or lock contention.
+- **Pixels/sec (Mandelbrot)**: Higher is better. Complex number calculations; tests floating-point performance.
+- **Msamples/sec (FFT)**: Higher is better. Fast Fourier Transform throughput; sensitive to memory access patterns and cache efficiency.
+
+**Memory Metrics:**
+- **MB/s (Write/Read)**: Higher is better. Sequential memory throughput. Write vs Read differences indicate asymmetric memory controllers or CPU features (e.g., write-combining).
+- **Combined Average**: Geometric mean of write and read speeds; useful for real-world workloads with mixed access patterns.
+
+**Disk Metrics:**
+- **MB/s (Write/Read)**: Higher is better. Sequential I/O throughput. Gap between write and read reflects disk scheduler behavior and caching.
+- **Note**: Results are heavily influenced by filesystem cache and system load at runtime. Run multiple times (`--count 5+`) for stability.
+
+**Statistical Analysis (with `--count > 1`):**
+- **Mean**: Average value across all runs.
+- **Std Dev**: Variability across runs. High values (>10% of mean) suggest system instability or background activity.
+- **P95/P99**: 95th and 99th percentile values. Use for identifying tail latencies and worst-case scenarios.
+- **CV% (Coefficient of Variation)**: Normalized variability. <5% is excellent; >15% suggests noisy results.
+
+### Comparison Tips
+
+1. **Relative Benchmarking**: Use these results to compare *before/after* on the same system (e.g., after software updates or configuration changes).
+2. **Multiple Runs**: Always use `--count 5+` for production comparisons. A single run is unreliable due to system noise.
+3. **Controlled Environment**: Close background apps, disable dynamic CPU scaling if possible, and run on a quiet system.
+4. **Document Context**: Record the exact command, system load, and ambient conditions for reproducibility.
+5. **Don't Over-Extrapolate**: These synthetic workloads don't reflect your specific real-world use case. Benchmark your actual workload for deployment decisions.
+
 ## Testing
 
 ```bash
