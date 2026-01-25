@@ -13,7 +13,6 @@
 ///
 /// Use these results to understand relative performance characteristics, but do NOT rely solely
 /// on these benchmarks for critical system purchasing, deployment, or performance guarantees.
-
 mod args;
 mod board_game;
 mod cpu;
