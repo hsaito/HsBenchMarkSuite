@@ -520,7 +520,7 @@ fn write_json_report(
     // CPU results
     writeln!(file, r#"    "cpu": {{"#)?;
     let cpu_primes: Vec<f64> = results.cpu.iter().map(|r| r.primes_per_sec).collect();
-    writeln!(file, r#"      "primes_per_sec": {{"#)?;
+    writeln!(file, r#"      "cpu_primes_per_sec": {{"#)?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -534,7 +534,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_matrix: Vec<f64> = results.cpu.iter().map(|r| r.matrix_mult_gflops).collect();
-    writeln!(file, r#"      "matrix_mult_gflops_1t": {{"#)?;
+    writeln!(file, r#"      "cpu_matrix_mult_gflops_1t": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -552,7 +552,7 @@ fn write_json_report(
         .iter()
         .map(|r| r.parallel_matrix_gflops)
         .collect();
-    writeln!(file, r#"      "matrix_mult_gflops_{}t": {{"#, args.threads)?;
+    writeln!(file, r#"      "cpu_matrix_mult_gflops_{}t": {{"#, args.threads)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -570,7 +570,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_speedup: Vec<f64> = results.cpu.iter().map(|r| r.parallel_speedup).collect();
-    writeln!(file, r#"      "parallel_speedup_{}t": {{"#, args.threads)?;
+    writeln!(file, r#"      "cpu_parallel_speedup_{}t": {{"#, args.threads)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -592,7 +592,7 @@ fn write_json_report(
         .iter()
         .map(|r| r.mandelbrot_pixels_per_sec)
         .collect();
-    writeln!(file, r#"      "mandelbrot_pixels_per_sec": {{"#)?;
+    writeln!(file, r#"      "cpu_mandelbrot_pixels_per_sec": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -610,7 +610,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_fft: Vec<f64> = results.cpu.iter().map(|r| r.fft_msamples_per_sec).collect();
-    writeln!(file, r#"      "fft_msamples_per_sec": {{"#)?;
+    writeln!(file, r#"      "cpu_fft_msamples_per_sec": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -627,7 +627,7 @@ fn write_json_report(
     // Memory results
     writeln!(file, r#"    "memory": {{"#)?;
     let mem_write: Vec<f64> = results.memory.iter().map(|r| r.write_throughput).collect();
-    writeln!(file, r#"      "write_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "memory_write_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -641,7 +641,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let mem_read: Vec<f64> = results.memory.iter().map(|r| r.read_throughput).collect();
-    writeln!(file, r#"      "read_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "memory_read_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -659,7 +659,7 @@ fn write_json_report(
         .iter()
         .map(|r| r.combined_throughput)
         .collect();
-    writeln!(file, r#"      "combined_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "memory_combined_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -680,7 +680,7 @@ fn write_json_report(
     // Disk results
     writeln!(file, r#"    "disk": {{"#)?;
     let disk_write: Vec<f64> = results.disk.iter().map(|r| r.write_throughput).collect();
-    writeln!(file, r#"      "write_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "disk_write_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -694,7 +694,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let disk_read: Vec<f64> = results.disk.iter().map(|r| r.read_throughput).collect();
-    writeln!(file, r#"      "read_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "disk_read_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -708,7 +708,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let disk_combined: Vec<f64> = results.disk.iter().map(|r| r.combined_throughput).collect();
-    writeln!(file, r#"      "combined_throughput_mbs": {{"#)?;
+    writeln!(file, r#"      "disk_combined_throughput_mbs": {{"#)?;;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
