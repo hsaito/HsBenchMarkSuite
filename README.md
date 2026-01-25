@@ -66,6 +66,10 @@ cargo run --release -- --count 5
 # Set number of threads for parallel benchmarks (default: 4)
 cargo run --release -- --thread 8
 
+# Set disk benchmark block size in bytes (default: 524288 = 512 KB)
+# Use 131072 for 128 KB, 1048576 for 1 MB
+cargo run --release -- --block-size 1048576
+
 # Export results to CSV with full statistical analysis
 cargo run --release -- --csv --count 10
 
@@ -73,7 +77,7 @@ cargo run --release -- --csv --count 10
 cargo run --release -- --json --count 10
 
 # Combine all options
-cargo run --release -- --scale 2.0 --count 5 --thread 8 --csv --json
+cargo run --release -- --scale 2.0 --count 5 --thread 8 --block-size 262144 --csv --json
 ```
 
 ### Statistical Analysis
@@ -86,6 +90,29 @@ When running multiple benchmarks (`--count > 1`), the suite now provides compreh
 - **Coefficient of Variation**: Normalized measure of variability (%)
 
 **Note**: Statistical metrics (standard deviation, percentiles, coefficient of variation) are only meaningful when running multiple times (`--count > 1`). Single-run benchmarks will show all values as 0 or N/A for these metrics, as there is no variance to measure. For reliable statistical analysis, use at least 3-5 runs (e.g., `--count 5`).
+
+### Disk Benchmark Configuration
+
+The disk benchmark now supports configurable block sizes for testing different I/O patterns:
+
+```rust
+use hs_benchmark_suite::disk::run_disk_benchmark_scaled_with_block_size;
+
+// Use default 512 KB block size
+let result = run_disk_benchmark_scaled(1.0);
+
+// Test with custom block sizes
+let result_128k = run_disk_benchmark_scaled_with_block_size(1.0, 128 * 1024);  // Small blocks for random access
+let result_512k = run_disk_benchmark_scaled_with_block_size(1.0, 512 * 1024);  // Default (sequential)
+let result_1m = run_disk_benchmark_scaled_with_block_size(1.0, 1024 * 1024);   // Large blocks for streaming
+```
+
+**Default block size**: 512 KB provides a good balance between:
+- Amortizing syscall overhead
+- Fitting in typical CPU caches (L3: 8-24 MB)
+- Matching filesystem page sizes
+
+**Platform support**: Direct I/O with sector alignment (4096 bytes) across Windows, Linux, FreeBSD, and macOS.
 
 ### System Information Capture
 
@@ -333,9 +360,12 @@ cargo run --release -- --count 5 --json
    - Colors automatically assigned to distinguish files
    - Hover over bars for exact values
    - Orange warning badges indicate when comparing different machines
+   - **Parameter mismatch warnings**: Automatic detection alerts you when files use different benchmark parameters (scale, runs, threads, block_size)
 
 ### Managing Files
 
+- **Configuration details**: Each file shows its benchmark configuration (Scale, Runs, Threads, Block size)
+- **Parameter warnings**: If files have different parameters, a warning banner appears suggesting fair comparison practices
 - **Reorder**: Drag files to change chart ordering (charts update in real-time)
 - **Remove**: Click the remove button on individual files to exclude them from analysis
 - **Clear all**: Start fresh by removing all files at once
@@ -382,12 +412,31 @@ cargo run --release -- --thread 4 --count 5 --json   # output_*_config1.json
 cargo run --release -- --thread 8 --count 5 --json   # output_*_config2.json
 
 # Load both to see the performance impact of thread count
+# ⚠️ Note: visualize.html will warn about the thread count difference
+```
+
+#### Fair Comparison Best Practices
+
+When comparing results, ensure consistent parameters:
+
+```bash
+# ✅ GOOD: Same parameters across runs
+cargo run --release -- --scale 1.0 --count 5 --thread 4 --json  # Run 1
+# ... (wait a bit to let system settle)
+cargo run --release -- --scale 1.0 --count 5 --thread 4 --json  # Run 2
+
+# ❌ AVOID: Different parameters make comparison misleading
+cargo run --release -- --scale 1.0 --count 3 --json  # Run 1
+cargo run --release -- --scale 2.0 --count 5 --json  # Run 2 - different scale & count!
+# Loading both in visualize.html will display a parameter mismatch warning
 ```
 
 ### Technical Details
 
 - **Chart Library**: Chart.js 4.4.0 (loaded from CDN)
 - **Colors**: Assigned from a predefined palette based on file load order
+- **Parameter Validation**: Automatically detects and warns about differences in scale, runs, threads, and block_size
+- **Configuration Metadata**: Each JSON file includes benchmark parameters for comparison accuracy
 - **Metadata**: Automatically extracted from JSON files (hostname, timestamp)
 - **Responsive Layout**: CSS Grid scales charts from 500px to available width
 - **No Installation**: Entire tool runs in the browser with no dependencies

@@ -104,14 +104,13 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
     let height = (256.0 * scale) as usize;
     let max_iter = (100.0 * scale) as u32;
 
-    let mut pixel_count = 0u64;
     let mut rounds = 1;
     let mut elapsed;
 
     loop {
         let start = Instant::now();
         for _ in 0..rounds {
-            pixel_count = calculate_mandelbrot(width, height, max_iter);
+            let _ = calculate_mandelbrot(width, height, max_iter);
         }
         elapsed = start.elapsed().as_secs_f64();
 
@@ -127,7 +126,7 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
         elapsed = 0.001;
     }
 
-    let total_pixels = (pixel_count as f64) * (rounds as f64);
+    let total_pixels = (width * height) as f64 * (rounds as f64);
     total_pixels / elapsed
 }
 

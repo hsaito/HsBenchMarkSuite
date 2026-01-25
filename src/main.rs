@@ -117,7 +117,8 @@ fn main() {
         // Disk Benchmark
         println!("Running Disk Benchmark...");
         let disk_start = Instant::now();
-        let disk_result = disk::run_disk_benchmark_scaled(cli_args.scale);
+        let disk_result =
+            disk::run_disk_benchmark_scaled_with_block_size(cli_args.scale, cli_args.block_size);
         let disk_duration = disk_start.elapsed();
         println!("Disk Write: {:.2} MB/s", disk_result.write_throughput);
         println!("Disk Read:  {:.2} MB/s", disk_result.read_throughput);
@@ -507,7 +508,8 @@ fn write_json_report(
     writeln!(file, r#"  "configuration": {{"#)?;
     writeln!(file, r#"    "scale": {},"#, args.scale)?;
     writeln!(file, r#"    "runs": {},"#, args.count)?;
-    writeln!(file, r#"    "threads": {}"#, args.threads)?;
+    writeln!(file, r#"    "threads": {},"#, args.threads)?;
+    writeln!(file, r#"    "block_size": {}"#, args.block_size)?;
     writeln!(file, "  }},")?;
 
     // Results

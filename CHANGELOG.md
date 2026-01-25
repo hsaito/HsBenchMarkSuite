@@ -5,6 +5,35 @@ All notable changes to HsBenchMarkSuite are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.2.2] - 2026-01-25
+
+### Added
+
+- **Configurable Block Size for Disk Benchmarks**
+  - New `run_disk_benchmark_scaled_with_block_size(scale, block_size)` function allows custom block sizes
+  - New `--block-size <SIZE>` CLI argument for command-line configuration (default: 524288 = 512 KB)
+  - Default block size: 512 KB (practical for most sequential I/O workloads)
+  - Enables testing different I/O patterns (131072 for 128 KB random-access, 1048576 for 1 MB streaming, etc.)
+  - Maintains platform equivalence with direct I/O flags across Windows, Linux, FreeBSD, and macOS
+
+- **Parameter Mismatch Warnings in HTML Visualization Tool**
+  - New automatic detection when comparing benchmark files with different parameters
+  - Displays warning banner highlighting differences in: scale, runs (count), threads, and block_size
+  - Shows configuration details for each loaded file (Scale, Runs, Threads, Block size)
+  - Prevents misleading comparisons by alerting users to parameter inconsistencies
+
+### Fixed
+
+- **Mandelbrot Benchmark**: Fixed pixel throughput calculation bug where multiply factor was incorrectly applied
+  - Previously: `pixel_count * rounds` (where `pixel_count` was last iteration's value)
+  - Now: `(width * height) * rounds` (actual pixels processed)
+  - Resolves 1000× variance in Run 3 measurements reported in earlier benchmarks
+- **HTML Visualization Tool**: Fixed issue where metric bars could fail to render when metric values were missing or malformed in loaded JSON files
+  - Improved null/undefined value handling in metric extraction
+  - Ensures all metric values are valid numbers with fallback to 0
+
 ## [0.2.1] - 2026-01-25
 
 ### Added

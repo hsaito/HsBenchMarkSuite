@@ -14,6 +14,7 @@ use std::os::windows::io::AsRawHandle;
 use std::fs::File;
 
 const BASE_FILE_SIZE: usize = 50_000_000; // 50 MB
+const DEFAULT_BLOCK_SIZE: usize = 512 * 1024; // 512 KB - modest default for sequential I/O
 const ALIGNMENT: usize = 4096; // Align buffers for O_DIRECT when available
 const TEST_DIR: &str = ".bench_temp";
 const TEST_FILE: &str = ".bench_temp/test_file.bin";
@@ -59,8 +60,12 @@ pub fn run_disk_benchmark() -> DiskResult {
 }
 
 pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
+    run_disk_benchmark_scaled_with_block_size(scale, DEFAULT_BLOCK_SIZE)
+}
+
+pub fn run_disk_benchmark_scaled_with_block_size(scale: f64, block_size: usize) -> DiskResult {
     // Warmup phase: small file to prime disk cache
-    warmup_disk(scale * 0.1);
+    warmup_disk_with_block_size(scale * 0.1, block_size);
 
     // Actual benchmark with full file
     let file_size = (BASE_FILE_SIZE as f64 * scale) as usize;
@@ -68,8 +73,8 @@ pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
     // Create temporary directory
     let _ = fs::create_dir(TEST_DIR);
 
-    let (mut data_buf, data_offset) = alloc_aligned(file_size);
-    let data_slice = &mut data_buf[data_offset..data_offset + file_size];
+    let (mut data_buf, data_offset) = alloc_aligned(block_size);
+    let data_slice = &mut data_buf[data_offset..data_offset + block_size];
     data_slice.fill(0xAB);
 
     // Write benchmark with direct I/O (bypassing OS cache)
@@ -109,7 +114,14 @@ pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
             #[cfg(windows)]
             drop_os_cache(file.as_raw_handle());
 
-            let _ = file.write_all(data_slice);
+            // Write in sequential blocks
+            let mut bytes_written = 0;
+            while bytes_written < file_size {
+                let remaining = file_size - bytes_written;
+                let write_size = remaining.min(block_size);
+                let _ = file.write_all(&data_slice[..write_size]);
+                bytes_written += write_size;
+            }
             let _ = file.sync_all();
         } // File handle dropped here, ensuring flush
     }
@@ -118,8 +130,8 @@ pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
 
     // Read benchmark with direct I/O (bypassing OS cache)
     let read_start = std::time::Instant::now();
-    let (mut buffer, buffer_offset) = alloc_aligned(file_size);
-    let buffer_slice = &mut buffer[buffer_offset..buffer_offset + file_size];
+    let (mut buffer, buffer_offset) = alloc_aligned(block_size);
+    let buffer_slice = &mut buffer[buffer_offset..buffer_offset + block_size];
     {
         let mut options = std::fs::OpenOptions::new();
         options.read(true);
@@ -155,7 +167,18 @@ pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
             #[cfg(windows)]
             drop_os_cache(file.as_raw_handle());
 
-            let _ = file.read_exact(buffer_slice);
+            // Read in sequential blocks
+            let mut bytes_read = 0;
+            while bytes_read < file_size {
+                let remaining = file_size - bytes_read;
+                let read_size = remaining.min(block_size);
+                match file.read_exact(&mut buffer_slice[..read_size]) {
+                    Ok(()) => {
+                        bytes_read += read_size;
+                    }
+                    Err(_) => break,
+                }
+            }
         } // File handle dropped here
     }
     let read_time = read_start.elapsed().as_secs_f64();
@@ -176,15 +199,15 @@ pub fn run_disk_benchmark_scaled(scale: f64) -> DiskResult {
     }
 }
 
-fn warmup_disk(scale: f64) {
+fn warmup_disk_with_block_size(scale: f64, block_size: usize) {
     const WARMUP_FILE: &str = ".bench_temp/warmup_file.bin";
     let file_size = (BASE_FILE_SIZE as f64 * scale) as usize;
 
     // Create temporary directory
     let _ = fs::create_dir(TEST_DIR);
 
-    let (mut data_buf, data_offset) = alloc_aligned(file_size);
-    let data_slice = &mut data_buf[data_offset..data_offset + file_size];
+    let (mut data_buf, data_offset) = alloc_aligned(block_size);
+    let data_slice = &mut data_buf[data_offset..data_offset + block_size];
     data_slice.fill(0xAB);
 
     // Warmup write with direct I/O
@@ -222,14 +245,21 @@ fn warmup_disk(scale: f64) {
             #[cfg(windows)]
             drop_os_cache(file.as_raw_handle());
 
-            let _ = file.write_all(data_slice);
+            // Write in sequential blocks
+            let mut bytes_written = 0;
+            while bytes_written < file_size {
+                let remaining = file_size - bytes_written;
+                let write_size = remaining.min(block_size);
+                let _ = file.write_all(&data_slice[..write_size]);
+                bytes_written += write_size;
+            }
             let _ = file.sync_all();
         }
     }
 
     // Warmup read with direct I/O
-    let (mut _buffer, buffer_offset) = alloc_aligned(file_size);
-    let buffer_slice = &mut _buffer[buffer_offset..buffer_offset + file_size];
+    let (mut _buffer, buffer_offset) = alloc_aligned(block_size);
+    let buffer_slice = &mut _buffer[buffer_offset..buffer_offset + block_size];
     {
         let mut options = std::fs::OpenOptions::new();
         options.read(true);
@@ -264,7 +294,18 @@ fn warmup_disk(scale: f64) {
             #[cfg(windows)]
             drop_os_cache(file.as_raw_handle());
 
-            let _ = file.read_exact(buffer_slice);
+            // Read in sequential blocks
+            let mut bytes_read = 0;
+            while bytes_read < file_size {
+                let remaining = file_size - bytes_read;
+                let read_size = remaining.min(block_size);
+                match file.read_exact(&mut buffer_slice[..read_size]) {
+                    Ok(()) => {
+                        bytes_read += read_size;
+                    }
+                    Err(_) => break,
+                }
+            }
         }
     }
 
@@ -367,7 +408,7 @@ mod tests {
     #[test]
     fn test_disk_warmup_no_panic() {
         // Ensure warmup doesn't panic and cleans up properly
-        warmup_disk(0.1);
+        warmup_disk_with_block_size(0.1, DEFAULT_BLOCK_SIZE);
         // Verify warmup file was cleaned up
         use std::path::Path;
         assert!(!Path::new(".bench_temp/warmup_file.bin").exists());
