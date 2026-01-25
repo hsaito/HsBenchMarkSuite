@@ -262,6 +262,45 @@ Duration: 1.08s
 cargo test
 ```
 
+## Data Export and Visualization
+
+Each benchmark run automatically exports results in two formats:
+
+### CSV Output
+- Filename: `output_YYYYMMDD_HHMMSS.csv` (e.g., `output_20260125_143022.csv`)
+- Contains raw benchmark metrics as structured tabular data
+- Header includes: `name`, `category`, `mean`, `std_dev`, `min`, `max`, `count`
+- No comment lines - data is directly importable into Excel, analysis tools, etc.
+
+### JSON Output
+- Filename: `output_YYYYMMDD_HHMMSS.json` (e.g., `output_20260125_143022.json`)
+- Includes metadata section with:
+  - `timestamp`: RFC3339 format timestamp (e.g., `2026-01-25T14:30:22+00:00`)
+  - `hostname`: Machine hostname for multi-machine comparisons
+- Contains full system information (CPU, memory, OS)
+- Preserves all statistics and raw benchmark results
+
+### Interactive Visualization
+
+Open `visualize.html` in any modern web browser to:
+- **Load and compare** multiple JSON benchmark files
+- **Drag & drop** files for easy loading
+- **View machine names and timestamps** for each data point
+- **Analyze trends** across multiple runs or different machines
+- **Compare metrics** side-by-side with interactive charts
+- **Export visuals** to PNG using browser developer tools
+
+#### Usage Example
+
+1. Run benchmarks on multiple machines or at different times
+2. Collect the `output_*.json` files
+3. Open `visualize.html` in your web browser
+4. Drag and drop the JSON files onto the upload area
+5. Select metrics to visualize or view all metrics at once
+6. Compare performance across machines and time periods
+
+This makes it easy to track performance trends or compare system configurations.
+
 ## Release Process
 
 Releases are automatically built and published when a git tag is pushed with the format `v{version}` (e.g., `v0.1.0`, `v1.2.3`).

@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 sysinfo = "0.38"
 libc = "0.2"
+chrono = "0.4"
 
 [[bin]]
 name = "benchmark"

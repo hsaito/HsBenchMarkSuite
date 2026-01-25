@@ -28,6 +28,7 @@ use memory::MemoryResult;
 use stats::Statistics;
 use std::time::Instant;
 use sysinfo_capture::SystemInfo;
+use chrono::Local;
 
 struct BenchmarkResults {
     cpu: Vec<CpuResult>,
@@ -260,7 +261,8 @@ fn main() {
         if let Err(e) = write_csv_report(&cli_args, &results, &system_info) {
             eprintln!("Error writing CSV report: {}", e);
         } else {
-            println!("CSV report written to output.csv");
+            let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
+            println!("CSV report written to output_{}.csv", timestamp);
         }
     }
 
@@ -269,7 +271,8 @@ fn main() {
         if let Err(e) = write_json_report(&cli_args, &results, &system_info) {
             eprintln!("Error writing JSON report: {}", e);
         } else {
-            println!("JSON report written to output.json");
+            let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
+            println!("JSON report written to output_{}.json", timestamp);
         }
     }
 
@@ -279,34 +282,14 @@ fn main() {
 fn write_csv_report(
     args: &BenchmarkArgs,
     results: &BenchmarkResults,
-    system_info: &SystemInfo,
+    _system_info: &SystemInfo,
 ) -> std::io::Result<()> {
     use std::fs::File;
     use std::io::Write;
 
-    let mut file = File::create("output.csv")?;
-
-    // Write system information header
-    writeln!(file, "# System Information")?;
-    writeln!(file, "# CPU: {}", system_info.cpu_brand)?;
-    writeln!(
-        file,
-        "# Cores: {} physical, {} logical",
-        system_info.cpu_physical_cores, system_info.cpu_logical_cores
-    )?;
-    writeln!(file, "# Memory: {} MB", system_info.total_memory_mb)?;
-    writeln!(
-        file,
-        "# OS: {} {}",
-        system_info.os_name, system_info.os_version
-    )?;
-    writeln!(file, "# Hostname: {}", system_info.hostname)?;
-    writeln!(
-        file,
-        "# Scale: {}, Runs: {}, Threads: {}",
-        args.scale, args.count, args.threads
-    )?;
-    writeln!(file)?;
+    let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
+    let filename = format!("output_{}.csv", timestamp);
+    let mut file = File::create(&filename)?;
 
     // Write header with individual runs and statistics
     let mut header = vec!["Metric".to_string()];
@@ -445,7 +428,10 @@ fn write_json_report(
     use std::fs::File;
     use std::io::Write;
 
-    let mut file = File::create("output.json")?;
+    let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
+    let iso_timestamp = Local::now().to_rfc3339();
+    let filename = format!("output_{}.json", timestamp);
+    let mut file = File::create(&filename)?;
 
     // Helper to create stats JSON
     let stats_json = |values: &[f64]| -> String {
@@ -467,6 +453,20 @@ fn write_json_report(
     };
 
     writeln!(file, "{{")?;
+
+    // Metadata (timestamp and hostname for easy comparison)
+    writeln!(file, r#"  "metadata": {{"#)?;
+    writeln!(
+        file,
+        r#"    "timestamp": "{}","#,
+        iso_timestamp
+    )?;
+    writeln!(
+        file,
+        r#"    "hostname": "{}""#,
+        system_info.hostname.replace("\"", "\\\"")
+    )?;
+    writeln!(file, "  }},")?;
 
     // System information
     writeln!(file, r#"  "system_info": {{"#)?;
