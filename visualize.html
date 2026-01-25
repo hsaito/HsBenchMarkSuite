@@ -407,11 +407,28 @@
             }
 
             let html = '<div class="file-list"><h3>Loaded Files (' + loadedData.length + ')</h3>';
+            
+            // Check for configuration mismatches
+            const mismatches = checkConfigurationMismatch();
+            if (mismatches) {
+                html += '<div style="background: #fff3e0; border: 1px solid #ffb74d; border-radius: 4px; padding: 12px; margin-bottom: 10px; color: #e65100;">';
+                html += '<strong>⚠️ Warning: Parameter mismatches detected!</strong><br>';
+                html += 'Comparing files with different benchmark parameters may produce misleading results:<br>';
+                mismatches.forEach(mismatch => {
+                    html += `• ${mismatch}<br>`;
+                });
+                html += 'Ensure all files use the same parameters for fair comparison.';
+                html += '</div>';
+            }
+            
             loadedData.forEach((item, idx) => {
+                const config = item.data.configuration || {};
+                const configStr = `Scale: ${config.scale || 'N/A'}, Runs: ${config.runs || 'N/A'}, Threads: ${config.threads || 'N/A'}, Block: ${config.block_size ? (config.block_size / 1024).toFixed(0) + ' KB' : 'N/A'}`;
                 html += `<div class="file-item" draggable="true" data-index="${idx}">
                     <div>
                         <strong>${item.name}</strong>
                         <div class="file-meta">Host: ${item.hostname} | Time: ${new Date(item.timestamp).toLocaleString()}</div>
+                        <div class="file-meta" style="font-size: 0.8em; color: #999; margin-top: 3px;">${configStr}</div>
                     </div>
                     <button class="file-remove" onclick="removeFile(${idx})">Remove</button>
                 </div>`;
@@ -467,6 +484,44 @@
                     e.currentTarget.classList.remove('dragover');
                 });
             });
+        }
+
+        function removeFile(idx) {
+            loadedData.splice(idx, 1);
+            renderFileList();
+            updateMetricSelect();
+        }
+
+        function checkConfigurationMismatch() {
+            if (loadedData.length < 2) {
+                return null;
+            }
+
+            const configs = loadedData.map(item => item.data.configuration || {});
+            const baseConfig = configs[0];
+            const mismatches = [];
+
+            // Check for differences in scale
+            if (configs.some(c => c.scale !== baseConfig.scale)) {
+                mismatches.push(`Scale differs: ${configs.map((c, i) => `${loadedData[i].name}=${c.scale || 'N/A'}`).join(', ')}`);
+            }
+
+            // Check for differences in runs (count)
+            if (configs.some(c => c.runs !== baseConfig.runs)) {
+                mismatches.push(`Runs differ: ${configs.map((c, i) => `${loadedData[i].name}=${c.runs || 'N/A'}`).join(', ')}`);
+            }
+
+            // Check for differences in threads
+            if (configs.some(c => c.threads !== baseConfig.threads)) {
+                mismatches.push(`Threads differ: ${configs.map((c, i) => `${loadedData[i].name}=${c.threads || 'N/A'}`).join(', ')}`);
+            }
+
+            // Check for differences in block_size
+            if (configs.some(c => c.block_size !== baseConfig.block_size)) {
+                mismatches.push(`Block size differs: ${configs.map((c, i) => `${loadedData[i].name}=${(c.block_size || 'N/A') === 'N/A' ? 'N/A' : ((c.block_size / 1024).toFixed(0) + ' KB')}`).join(', ')}`);
+            }
+
+            return mismatches.length > 0 ? mismatches : null;
         }
 
         function removeFile(idx) {

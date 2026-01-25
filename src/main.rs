@@ -507,7 +507,8 @@ fn write_json_report(
     writeln!(file, r#"  "configuration": {{"#)?;
     writeln!(file, r#"    "scale": {},"#, args.scale)?;
     writeln!(file, r#"    "runs": {},"#, args.count)?;
-    writeln!(file, r#"    "threads": {}"#, args.threads)?;
+    writeln!(file, r#"    "threads": {},"#, args.threads)?;
+    writeln!(file, r#"    "block_size": {}"#, args.block_size)?;
     writeln!(file, "  }},")?;
 
     // Results
