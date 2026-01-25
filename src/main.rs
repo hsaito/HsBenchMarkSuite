@@ -1,3 +1,18 @@
+/// HsBenchMarkSuite - Rust Performance Benchmark Suite
+///
+/// DISCLAIMER:
+/// This benchmark suite provides runtime metrics for synthetic test scenarios.
+/// Results represent performance on specific algorithms (prime calculations, matrix operations, sequential I/O)
+/// and do NOT necessarily equate to actual system capability for real-world workloads.
+///
+/// Key limitations:
+/// - Tests controlled, synthetic scenarios that may not represent production usage
+/// - Does not account for complex caching effects, kernel scheduling, or variable system load
+/// - Results are single point-in-time measurements under specific conditions
+/// - Should be used as ONE OF MANY DATA POINTS, not as the sole basis for system evaluation
+///
+/// Use these results to understand relative performance characteristics, but do NOT rely solely
+/// on these benchmarks for critical system purchasing, deployment, or performance guarantees.
 mod args;
 mod board_game;
 mod cpu;
@@ -28,6 +43,13 @@ fn main() {
         board_game::run_board_game();
         return;
     }
+
+    // Display disclaimer
+    println!("DISCLAIMER: Benchmark Results vs Actual System Capability");
+    println!("These results reflect runtime metrics for synthetic test scenarios");
+    println!("and do NOT necessarily equate to actual system capability for");
+    println!("real-world workloads. Use these results as one of many data points,");
+    println!("not as the sole basis for system evaluation.\n");
 
     // Capture system information
     let system_info = SystemInfo::capture();
