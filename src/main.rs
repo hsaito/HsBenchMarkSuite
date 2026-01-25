@@ -22,13 +22,13 @@ mod stats;
 mod sysinfo_capture;
 
 use args::BenchmarkArgs;
+use chrono::Local;
 use cpu::CpuResult;
 use disk::DiskResult;
 use memory::MemoryResult;
 use stats::Statistics;
 use std::time::Instant;
 use sysinfo_capture::SystemInfo;
-use chrono::Local;
 
 struct BenchmarkResults {
     cpu: Vec<CpuResult>,
@@ -456,11 +456,7 @@ fn write_json_report(
 
     // Metadata (timestamp and hostname for easy comparison)
     writeln!(file, r#"  "metadata": {{"#)?;
-    writeln!(
-        file,
-        r#"    "timestamp": "{}","#,
-        iso_timestamp
-    )?;
+    writeln!(file, r#"    "timestamp": "{}","#, iso_timestamp)?;
     writeln!(
         file,
         r#"    "hostname": "{}""#,
@@ -552,7 +548,11 @@ fn write_json_report(
         .iter()
         .map(|r| r.parallel_matrix_gflops)
         .collect();
-    writeln!(file, r#"      "cpu_matrix_mult_gflops_{}t": {{"#, args.threads)?;
+    writeln!(
+        file,
+        r#"      "cpu_matrix_mult_gflops_{}t": {{"#,
+        args.threads
+    )?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -570,7 +570,11 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_speedup: Vec<f64> = results.cpu.iter().map(|r| r.parallel_speedup).collect();
-    writeln!(file, r#"      "cpu_parallel_speedup_{}t": {{"#, args.threads)?;
+    writeln!(
+        file,
+        r#"      "cpu_parallel_speedup_{}t": {{"#,
+        args.threads
+    )?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
