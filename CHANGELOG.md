@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-01-25
+
+### Fixed
+
+- **CRITICAL: Mandelbrot & FFT Benchmarks**: Fixed aggressive compiler optimization in release builds
+  - Added `std::hint::black_box()` to prevent dead code elimination of benchmark calculations
+  - Resolves issue where release builds showed absurdly high results (42+ quadrillion pixels/sec)
+  - Compiler was optimizing away most/all calculations when results weren't "observably used"
+  - Now properly accumulates computation results through black_box to force full execution
+  - Changed `calculate_mandelbrot()` to return iteration sum instead of pixel count for meaningful checksums
+  - Debug builds were unaffected; only release builds with `-O3` and LTO showed the problem
+  - **Impact**: Release build results now accurately reflect actual computational work performed
+
 ## [0.2.3] - 2026-01-25
 
 ### Fixed
