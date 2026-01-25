@@ -87,6 +87,29 @@ When running multiple benchmarks (`--count > 1`), the suite now provides compreh
 
 **Note**: Statistical metrics (standard deviation, percentiles, coefficient of variation) are only meaningful when running multiple times (`--count > 1`). Single-run benchmarks will show all values as 0 or N/A for these metrics, as there is no variance to measure. For reliable statistical analysis, use at least 3-5 runs (e.g., `--count 5`).
 
+### Disk Benchmark Configuration
+
+The disk benchmark now supports configurable block sizes for testing different I/O patterns:
+
+```rust
+use hs_benchmark_suite::disk::run_disk_benchmark_scaled_with_block_size;
+
+// Use default 512 KB block size
+let result = run_disk_benchmark_scaled(1.0);
+
+// Test with custom block sizes
+let result_128k = run_disk_benchmark_scaled_with_block_size(1.0, 128 * 1024);  // Small blocks for random access
+let result_512k = run_disk_benchmark_scaled_with_block_size(1.0, 512 * 1024);  // Default (sequential)
+let result_1m = run_disk_benchmark_scaled_with_block_size(1.0, 1024 * 1024);   // Large blocks for streaming
+```
+
+**Default block size**: 512 KB provides a good balance between:
+- Amortizing syscall overhead
+- Fitting in typical CPU caches (L3: 8-24 MB)
+- Matching filesystem page sizes
+
+**Platform support**: Direct I/O with sector alignment (4096 bytes) across Windows, Linux, FreeBSD, and macOS.
+
 ### System Information Capture
 
 Every benchmark run now captures and displays:

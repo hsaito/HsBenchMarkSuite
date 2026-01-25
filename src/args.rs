@@ -3,6 +3,7 @@ pub struct BenchmarkArgs {
     pub scale: f64,
     pub count: usize,
     pub threads: usize,
+    pub block_size: usize,
     pub csv: bool,
     pub json: bool,
     pub board_game: bool,
@@ -14,6 +15,7 @@ impl Default for BenchmarkArgs {
             scale: 1.0,
             count: 3,
             threads: 4,
+            block_size: 512 * 1024, // 512 KB default
             csv: false,
             json: false,
             board_game: false,
@@ -57,6 +59,15 @@ impl BenchmarkArgs {
                         i += 1;
                     }
                 }
+                "--block-size" => {
+                    if i + 1 < cli_args.len() {
+                        args.block_size = cli_args[i + 1].parse().unwrap_or(512 * 1024);
+                        i += 2;
+                    } else {
+                        eprintln!("Error: --block-size requires a value");
+                        i += 1;
+                    }
+                }
                 "--csv" => {
                     args.csv = true;
                     i += 1;
@@ -96,6 +107,11 @@ impl BenchmarkArgs {
             args.threads = 4;
         }
 
+        if args.block_size == 0 {
+            eprintln!("Warning: block-size must be at least 1, setting to 512 KB");
+            args.block_size = 512 * 1024;
+        }
+
         args
     }
 
@@ -112,6 +128,8 @@ impl BenchmarkArgs {
         println!("                        Results from multiple runs are averaged");
         println!("    --thread <NUM>     Number of threads for parallel benchmark (default: 4)");
         println!("                        Controls multithreaded matrix multiplication");
+        println!("    --block-size <SIZE> Disk benchmark block size in bytes (default: 524288)");
+        println!("                        Use 131072 for 128 KB, 1048576 for 1 MB, etc.");
         println!("    --csv              Output results to output.csv file");
         println!("    --json             Output results to output.json file with full statistics");
         println!("    --help, -h         Print this help message");
@@ -121,7 +139,9 @@ impl BenchmarkArgs {
         println!("    benchmark --scale 2.0        # Run with 2x intensity");
         println!("    benchmark --count 3          # Run 3 times and show average");
         println!("    benchmark --thread 8         # Run parallel test with 8 threads");
-        println!("    benchmark --scale 0.5 --count 5 --thread 2  # Combined options");
+        println!("    benchmark --block-size 131072 # Use 128 KB blocks for disk benchmark");
+        println!("    benchmark --scale 0.5 --count 5 --thread 2 --block-size 1048576");
+        println!("                                  # Combined options with 1 MB blocks");
     }
 }
 
@@ -135,6 +155,7 @@ mod tests {
         assert_eq!(args.scale, 1.0);
         assert_eq!(args.count, 3);
         assert_eq!(args.threads, 4);
+        assert_eq!(args.block_size, 512 * 1024);
         assert!(!args.csv);
         assert!(!args.json);
         assert!(!args.board_game);
@@ -148,6 +169,7 @@ mod tests {
             scale: -1.0,
             count: 1,
             threads: 4,
+            block_size: 512 * 1024,
             csv: false,
             json: false,
             board_game: false,
@@ -162,6 +184,7 @@ mod tests {
             scale: 1.0,
             count: 0,
             threads: 4,
+            block_size: 512 * 1024,
             csv: false,
             json: false,
             board_game: false,
@@ -175,6 +198,7 @@ mod tests {
             scale: 2.5,
             count: 10,
             threads: 8,
+            block_size: 1024 * 1024,
             csv: true,
             json: true,
             board_game: true,
@@ -182,8 +206,43 @@ mod tests {
         assert_eq!(args.scale, 2.5);
         assert_eq!(args.count, 10);
         assert_eq!(args.threads, 8);
+        assert_eq!(args.block_size, 1024 * 1024);
         assert!(args.csv);
         assert!(args.json);
         assert!(args.board_game);
+    }
+
+    #[test]
+    fn test_block_size_default() {
+        let args = BenchmarkArgs::default();
+        assert_eq!(args.block_size, 512 * 1024, "Default block size should be 512 KB");
+    }
+
+    #[test]
+    fn test_block_size_custom_128k() {
+        let args = BenchmarkArgs {
+            scale: 1.0,
+            count: 1,
+            threads: 4,
+            block_size: 128 * 1024,
+            csv: false,
+            json: false,
+            board_game: false,
+        };
+        assert_eq!(args.block_size, 128 * 1024);
+    }
+
+    #[test]
+    fn test_block_size_custom_1m() {
+        let args = BenchmarkArgs {
+            scale: 1.0,
+            count: 1,
+            threads: 4,
+            block_size: 1024 * 1024,
+            csv: false,
+            json: false,
+            board_game: false,
+        };
+        assert_eq!(args.block_size, 1024 * 1024);
     }
 }

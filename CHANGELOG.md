@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-01-25
+
+### Added
+
+- **Configurable Block Size for Disk Benchmarks**
+  - New `run_disk_benchmark_scaled_with_block_size(scale, block_size)` function allows custom block sizes
+  - Default block size: 512 KB (practical for most sequential I/O workloads)
+  - Enables testing different I/O patterns (128KB for random-access, 1MB for streaming, etc.)
+  - Maintains platform equivalence with direct I/O flags across Windows, Linux, FreeBSD, and macOS
+
 ### Fixed
 
+- **Mandelbrot Benchmark**: Fixed pixel throughput calculation bug where multiply factor was incorrectly applied
+  - Previously: `pixel_count * rounds` (where `pixel_count` was last iteration's value)
+  - Now: `(width * height) * rounds` (actual pixels processed)
+  - Resolves 1000× variance in Run 3 measurements reported in earlier benchmarks
 - **HTML Visualization Tool**: Fixed issue where metric bars could fail to render when metric values were missing or malformed in loaded JSON files
   - Improved null/undefined value handling in metric extraction
   - Ensures all metric values are valid numbers with fallback to 0
