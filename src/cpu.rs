@@ -127,7 +127,7 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
         elapsed = 0.001;
     }
 
-    let total_pixels = (pixel_count as f64) * (rounds as f64);
+    let total_pixels = (width * height) as f64 * (rounds as f64);
     total_pixels / elapsed
 }
 
