@@ -66,6 +66,10 @@ cargo run --release -- --count 5
 # Set number of threads for parallel benchmarks (default: 4)
 cargo run --release -- --thread 8
 
+# Set disk benchmark block size in bytes (default: 524288 = 512 KB)
+# Use 131072 for 128 KB, 1048576 for 1 MB
+cargo run --release -- --block-size 1048576
+
 # Export results to CSV with full statistical analysis
 cargo run --release -- --csv --count 10
 
@@ -73,7 +77,7 @@ cargo run --release -- --csv --count 10
 cargo run --release -- --json --count 10
 
 # Combine all options
-cargo run --release -- --scale 2.0 --count 5 --thread 8 --csv --json
+cargo run --release -- --scale 2.0 --count 5 --thread 8 --block-size 262144 --csv --json
 ```
 
 ### Statistical Analysis

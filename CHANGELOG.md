@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Configurable Block Size for Disk Benchmarks**
   - New `run_disk_benchmark_scaled_with_block_size(scale, block_size)` function allows custom block sizes
+  - New `--block-size <SIZE>` CLI argument for command-line configuration (default: 524288 = 512 KB)
   - Default block size: 512 KB (practical for most sequential I/O workloads)
-  - Enables testing different I/O patterns (128KB for random-access, 1MB for streaming, etc.)
+  - Enables testing different I/O patterns (131072 for 128 KB random-access, 1048576 for 1 MB streaming, etc.)
   - Maintains platform equivalence with direct I/O flags across Windows, Linux, FreeBSD, and macOS
 
 ### Fixed
