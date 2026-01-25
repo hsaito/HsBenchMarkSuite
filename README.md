@@ -53,12 +53,14 @@ The benchmark suite supports command-line arguments to customize behavior:
 # Display help
 cargo run --release -- --help
 
+# Run with default settings (count: 3)
+cargo run --release
+
 # Run with custom scale (default: 1.0)
 # Higher scale = more intensive, longer duration
 cargo run --release -- --scale 2.0
 
-# Run benchmarks multiple times (default: 1)
-# Results from multiple runs are averaged and analyzed statistically
+# Run benchmarks multiple times for better statistics (default: 3)
 cargo run --release -- --count 5
 
 # Set number of threads for parallel benchmarks (default: 4)
@@ -82,6 +84,8 @@ When running multiple benchmarks (`--count > 1`), the suite now provides compreh
 - **Min/Max**: Range of results
 - **Percentiles**: P50 (median), P95, P99
 - **Coefficient of Variation**: Normalized measure of variability (%)
+
+**Note**: Statistical metrics (standard deviation, percentiles, coefficient of variation) are only meaningful when running multiple times (`--count > 1`). Single-run benchmarks will show all values as 0 or N/A for these metrics, as there is no variance to measure. For reliable statistical analysis, use at least 3-5 runs (e.g., `--count 5`).
 
 ### System Information Capture
 
@@ -261,6 +265,45 @@ Duration: 1.08s
 ```bash
 cargo test
 ```
+
+## Data Export and Visualization
+
+Each benchmark run automatically exports results in two formats:
+
+### CSV Output
+- Filename: `output_YYYYMMDD_HHMMSS.csv` (e.g., `output_20260125_143022.csv`)
+- Contains raw benchmark metrics as structured tabular data
+- Header includes: `name`, `category`, `mean`, `std_dev`, `min`, `max`, `count`
+- No comment lines - data is directly importable into Excel, analysis tools, etc.
+
+### JSON Output
+- Filename: `output_YYYYMMDD_HHMMSS.json` (e.g., `output_20260125_143022.json`)
+- Includes metadata section with:
+  - `timestamp`: RFC3339 format timestamp (e.g., `2026-01-25T14:30:22+00:00`)
+  - `hostname`: Machine hostname for multi-machine comparisons
+- Contains full system information (CPU, memory, OS)
+- Preserves all statistics and raw benchmark results
+
+### Interactive Visualization
+
+Open `visualize.html` in any modern web browser to:
+- **Load and compare** multiple JSON benchmark files
+- **Drag & drop** files for easy loading
+- **View machine names and timestamps** for each data point
+- **Analyze trends** across multiple runs or different machines
+- **Compare metrics** side-by-side with interactive charts
+- **Export visuals** to PNG using browser developer tools
+
+#### Usage Example
+
+1. Run benchmarks on multiple machines or at different times
+2. Collect the `output_*.json` files
+3. Open `visualize.html` in your web browser
+4. Drag and drop the JSON files onto the upload area
+5. Select metrics to visualize or view all metrics at once
+6. Compare performance across machines and time periods
+
+This makes it easy to track performance trends or compare system configurations.
 
 ## Release Process
 

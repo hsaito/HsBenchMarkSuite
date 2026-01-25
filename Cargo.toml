@@ -1,11 +1,12 @@
 [package]
 name = "hs-benchmark-suite"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
 sysinfo = "0.38"
 libc = "0.2"
+chrono = "0.4"
 
 [[bin]]
 name = "benchmark"
