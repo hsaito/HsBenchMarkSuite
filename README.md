@@ -74,7 +74,7 @@ cargo run --release -- --json --count 10
 cargo run --release -- --scale 2.0 --count 5 --thread 8 --csv --json
 ```
 
-### Statistical Analysis (NEW!)
+### Statistical Analysis
 
 When running multiple benchmarks (`--count > 1`), the suite now provides comprehensive statistical analysis:
 - **Mean**: Average value across all runs
@@ -83,7 +83,7 @@ When running multiple benchmarks (`--count > 1`), the suite now provides compreh
 - **Percentiles**: P50 (median), P95, P99
 - **Coefficient of Variation**: Normalized measure of variability (%)
 
-### System Information Capture (NEW!)
+### System Information Capture
 
 Every benchmark run now captures and displays:
 - CPU brand and model
@@ -92,7 +92,7 @@ Every benchmark run now captures and displays:
 - Operating system and version
 - Hostname
 
-### Warmup Phase (NEW!)
+### Warmup Phase
 
 All benchmarks now include a warmup iteration before timing to:
 - Prime CPU caches and branch predictors
