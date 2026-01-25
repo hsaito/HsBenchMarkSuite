@@ -1,0 +1,16 @@
+[package]
+name = "hs-benchmark-suite"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sysinfo = "0.37"
+libc = "0.2"
+
+[[bin]]
+name = "benchmark"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true

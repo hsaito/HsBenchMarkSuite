@@ -1,0 +1,29 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# VSCode
+.vscode/
+.history/
+*.code-workspace
+
+# IDE
+.idea/
+.DS_Store
+
+# Environment
+.env
+.env.local
+
+# OS
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Benchmark temp files
+.bench_temp/
+.bench_test_*.tmp
+output.csv
+output.json

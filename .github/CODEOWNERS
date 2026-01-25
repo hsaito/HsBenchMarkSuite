@@ -1,0 +1,9 @@
+# This file designates code owners for the repository
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @hsaito
+
+# Specific file types can have different owners
+# *.rs @hsaito
+# .github/ @hsaito
