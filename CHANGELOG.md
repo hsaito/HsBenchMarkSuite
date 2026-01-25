@@ -104,7 +104,7 @@ Every run captures:
 - Operating system and version
 - Hostname for cross-machine identification
 
-## [0.1.0] - 2026-01-01
+## [0.1.0] - 2026-01-24
 
 ### Added
 
