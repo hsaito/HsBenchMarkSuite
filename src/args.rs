@@ -12,7 +12,7 @@ impl Default for BenchmarkArgs {
     fn default() -> Self {
         Self {
             scale: 1.0,
-            count: 1,
+            count: 3,
             threads: 4,
             csv: false,
             json: false,
@@ -108,7 +108,7 @@ impl BenchmarkArgs {
         println!("OPTIONS:");
         println!("    --scale <VALUE>    Scale factor for benchmark intensity (default: 1.0)");
         println!("                        Higher values increase test duration and memory usage");
-        println!("    --count <NUM>      Number of times to run benchmarks (default: 1)");
+        println!("    --count <NUM>      Number of times to run benchmarks (default: 3)")
         println!("                        Results from multiple runs are averaged");
         println!("    --thread <NUM>     Number of threads for parallel benchmark (default: 4)");
         println!("                        Controls multithreaded matrix multiplication");

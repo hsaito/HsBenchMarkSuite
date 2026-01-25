@@ -53,12 +53,14 @@ The benchmark suite supports command-line arguments to customize behavior:
 # Display help
 cargo run --release -- --help
 
+# Run with default settings (count: 3)
+cargo run --release
+
 # Run with custom scale (default: 1.0)
 # Higher scale = more intensive, longer duration
 cargo run --release -- --scale 2.0
 
-# Run benchmarks multiple times (default: 1)
-# Results from multiple runs are averaged and analyzed statistically
+# Run benchmarks multiple times for better statistics (default: 3)
 cargo run --release -- --count 5
 
 # Set number of threads for parallel benchmarks (default: 4)
@@ -82,6 +84,8 @@ When running multiple benchmarks (`--count > 1`), the suite now provides compreh
 - **Min/Max**: Range of results
 - **Percentiles**: P50 (median), P95, P99
 - **Coefficient of Variation**: Normalized measure of variability (%)
+
+**Note**: Statistical metrics (standard deviation, percentiles, coefficient of variation) are only meaningful when running multiple times (`--count > 1`). Single-run benchmarks will show all values as 0 or N/A for these metrics, as there is no variance to measure. For reliable statistical analysis, use at least 3-5 runs (e.g., `--count 5`).
 
 ### System Information Capture
 
