@@ -106,11 +106,13 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
 
     let mut rounds = 1;
     let mut elapsed;
+    let mut checksum = 0u64; // Prevent compiler from optimizing away the calculation
 
     loop {
         let start = Instant::now();
         for _ in 0..rounds {
-            let _ = calculate_mandelbrot(width, height, max_iter);
+            let result = calculate_mandelbrot(width, height, max_iter);
+            checksum = checksum.wrapping_add(std::hint::black_box(result));
         }
         elapsed = start.elapsed().as_secs_f64();
 
@@ -126,14 +128,17 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
         elapsed = 0.01;
     }
 
+    // Force compiler to keep checksum (prevents dead code elimination)
+    std::hint::black_box(checksum);
+
     let total_pixels = (width * height) as f64 * (rounds as f64);
     total_pixels / elapsed
 }
 
 /// Calculate Mandelbrot set for given resolution
-/// Returns: number of pixels calculated
+/// Returns: iteration count sum (used as checksum to prevent optimization)
 fn calculate_mandelbrot(width: usize, height: usize, max_iter: u32) -> u64 {
-    let mut count = 0u64;
+    let mut iter_sum = 0u64;
 
     for y in 0..height {
         for x in 0..width {
@@ -159,11 +164,11 @@ fn calculate_mandelbrot(width: usize, height: usize, max_iter: u32) -> u64 {
                 iter += 1;
             }
 
-            count += 1;
+            iter_sum = iter_sum.wrapping_add(iter as u64);
         }
     }
 
-    count
+    iter_sum
 }
 
 /// Benchmark Fast Fourier Transform
@@ -182,12 +187,16 @@ fn benchmark_fft(scale: f64) -> f64 {
 
     let mut rounds = 1;
     let mut elapsed;
+    let mut checksum = 0.0f64; // Prevent compiler from optimizing away the calculation
 
     loop {
         let start = Instant::now();
         for _ in 0..rounds {
             let mut data = input.clone();
             cooley_tukey_fft(&mut data);
+            // Use first element as checksum
+            let result = data[0].0 + data[0].1;
+            checksum += std::hint::black_box(result);
         }
         elapsed = start.elapsed().as_secs_f64();
 
@@ -201,6 +210,9 @@ fn benchmark_fft(scale: f64) -> f64 {
     if elapsed == 0.0 {
         elapsed = 0.01;
     }
+
+    // Force compiler to keep checksum (prevents dead code elimination)
+    std::hint::black_box(checksum);
 
     let total_samples = (size as f64) * (rounds as f64) / 1_000_000.0;
     total_samples / elapsed
