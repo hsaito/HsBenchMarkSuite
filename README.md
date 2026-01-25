@@ -360,9 +360,12 @@ cargo run --release -- --count 5 --json
    - Colors automatically assigned to distinguish files
    - Hover over bars for exact values
    - Orange warning badges indicate when comparing different machines
+   - **Parameter mismatch warnings**: Automatic detection alerts you when files use different benchmark parameters (scale, runs, threads, block_size)
 
 ### Managing Files
 
+- **Configuration details**: Each file shows its benchmark configuration (Scale, Runs, Threads, Block size)
+- **Parameter warnings**: If files have different parameters, a warning banner appears suggesting fair comparison practices
 - **Reorder**: Drag files to change chart ordering (charts update in real-time)
 - **Remove**: Click the remove button on individual files to exclude them from analysis
 - **Clear all**: Start fresh by removing all files at once
@@ -409,12 +412,31 @@ cargo run --release -- --thread 4 --count 5 --json   # output_*_config1.json
 cargo run --release -- --thread 8 --count 5 --json   # output_*_config2.json
 
 # Load both to see the performance impact of thread count
+# ⚠️ Note: visualize.html will warn about the thread count difference
+```
+
+#### Fair Comparison Best Practices
+
+When comparing results, ensure consistent parameters:
+
+```bash
+# ✅ GOOD: Same parameters across runs
+cargo run --release -- --scale 1.0 --count 5 --thread 4 --json  # Run 1
+# ... (wait a bit to let system settle)
+cargo run --release -- --scale 1.0 --count 5 --thread 4 --json  # Run 2
+
+# ❌ AVOID: Different parameters make comparison misleading
+cargo run --release -- --scale 1.0 --count 3 --json  # Run 1
+cargo run --release -- --scale 2.0 --count 5 --json  # Run 2 - different scale & count!
+# Loading both in visualize.html will display a parameter mismatch warning
 ```
 
 ### Technical Details
 
 - **Chart Library**: Chart.js 4.4.0 (loaded from CDN)
 - **Colors**: Assigned from a predefined palette based on file load order
+- **Parameter Validation**: Automatically detects and warns about differences in scale, runs, threads, and block_size
+- **Configuration Metadata**: Each JSON file includes benchmark parameters for comparison accuracy
 - **Metadata**: Automatically extracted from JSON files (hostname, timestamp)
 - **Responsive Layout**: CSS Grid scales charts from 500px to available width
 - **No Installation**: Entire tool runs in the browser with no dependencies

@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enables testing different I/O patterns (131072 for 128 KB random-access, 1048576 for 1 MB streaming, etc.)
   - Maintains platform equivalence with direct I/O flags across Windows, Linux, FreeBSD, and macOS
 
+- **Parameter Mismatch Warnings in HTML Visualization Tool**
+  - New automatic detection when comparing benchmark files with different parameters
+  - Displays warning banner highlighting differences in: scale, runs (count), threads, and block_size
+  - Shows configuration details for each loaded file (Scale, Runs, Threads, Block size)
+  - Prevents misleading comparisons by alerting users to parameter inconsistencies
+
 ### Fixed
 
 - **Mandelbrot Benchmark**: Fixed pixel throughput calculation bug where multiply factor was incorrectly applied
