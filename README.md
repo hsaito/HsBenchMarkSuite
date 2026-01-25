@@ -268,69 +268,163 @@ cargo test
 
 ## Data Export and Visualization
 
-Each benchmark run automatically exports results in two formats:
+Each benchmark run automatically exports results in two formats for analysis and comparison.
 
 ### CSV Output
-- Filename: `output_YYYYMMDD_HHMMSS.csv` (e.g., `output_20260125_143022.csv`)
-- Contains raw benchmark metrics as structured tabular data
-- Header includes: `name`, `category`, `mean`, `std_dev`, `min`, `max`, `count`
-- No comment lines - data is directly importable into Excel, analysis tools, etc.
+- **Filename**: `output_YYYYMMDD_HHMMSS.csv` (e.g., `output_20260125_143022.csv`)
+- **Format**: Clean tabular data with no comment lines, directly importable into Excel, Pandas, R, etc.
+- **Contents**:
+  - Rows represent individual metrics (CPU primes, memory throughput, disk throughput, etc.)
+  - Columns include: metric name, results from each run, statistical summaries
+  - Headers: `name`, `category`, `mean`, `std_dev`, `min`, `max`, `count`, `p50`, `p95`, `p99`, `cv_percent`
+  - Prefixed metric names (e.g., `cpu_primes_per_sec`, `memory_write_throughput_mbs`, `disk_read_throughput_mbs`)
+- **Use Case**: Data analysis, spreadsheet applications, statistical tools, trend analysis over time
 
 ### JSON Output
-- Filename: `output_YYYYMMDD_HHMMSS.json` (e.g., `output_20260125_143022.json`)
-- Includes metadata section with:
-  - `timestamp`: RFC3339 format timestamp (e.g., `2026-01-25T14:30:22+00:00`)
-  - `hostname`: Machine hostname for multi-machine comparisons
-- Contains full system information (CPU, memory, OS)
-- Preserves all statistics and raw benchmark results
+- **Filename**: `output_YYYYMMDD_HHMMSS.json` (e.g., `output_20260125_143022.json`)
+- **Metadata Section**:
+  - `timestamp`: RFC3339 format (e.g., `2026-01-25T14:30:22+00:00`) - enables trend tracking
+  - `hostname`: Machine hostname - essential for multi-machine comparisons
+- **Contents**:
+  - Complete system information (CPU brand/cores, memory, OS version)
+  - Benchmark configuration (scale, thread count, number of runs)
+  - All metrics with individual run values and full statistical analysis
+  - Prefixed metric names for easy programmatic access
+- **Use Case**: CI/CD integration, machine-readable format for automated analysis, backup/archiving
 
-### Interactive Visualization
+### Interactive HTML Visualization (`visualize.html`)
 
-Open `visualize.html` in any modern web browser to:
-- **Load and compare** multiple JSON benchmark files
-- **Drag & drop** files for easy loading
-- **View machine names and timestamps** for each data point
-- **Analyze trends** across multiple runs or different machines
-- **Compare metrics** side-by-side with interactive charts
-- **Export visuals** to PNG using browser developer tools
+A fully-featured interactive tool included with every release for comparing and analyzing benchmark results across machines and time periods.
 
-#### Usage Example
+**Features**:
+- **Multi-file Loading**: Drag and drop multiple JSON files simultaneously to compare them
+- **Automatic Metrics Discovery**: Detects all unique metrics across loaded files
+- **Interactive Charts**: One chart per metric showing all loaded files side-by-side
+- **Machine Identification**: Displays hostname and timestamp for each file; shows warning badges when comparing different machines
+- **File Management**: Reorder files by drag-and-drop, remove individual files, or clear all to start fresh
+- **Responsive Design**: Charts automatically scale to fit your screen
 
-1. Run benchmarks on multiple machines or at different times
-2. Collect the `output_*.json` files
-3. Open `visualize.html` in your web browser
-4. Drag and drop the JSON files onto the upload area
-5. Select metrics to visualize or view all metrics at once
-6. Compare performance across machines and time periods
+See [Using the HTML Visualization Tool](#using-the-html-visualization-tool) below for detailed usage instructions and example workflows.
 
-This makes it easy to track performance trends or compare system configurations.
+## Using the HTML Visualization Tool
 
-## Release Process
+### Preparation
 
-Releases are automatically built and published when a git tag is pushed with the format `v{version}` (e.g., `v0.1.0`, `v1.2.3`).
+Run benchmarks on different machines or at different times, collecting the JSON output files:
+
+```bash
+# Run benchmarks with JSON output
+cargo run --release -- --count 5 --json
+
+# Creates: output_YYYYMMDD_HHMMSS.json
+# Example: output_20260125_143022.json
+```
+
+### Getting Started
+
+1. **Open the tool**: Launch `visualize.html` in any modern web browser (Chrome, Firefox, Safari, Edge)
+   - File is self-contained with no external dependencies or installation required
+
+2. **Load your data**: Drag and drop one or more `output_*.json` files onto the page
+   - Files are appended to the comparison (existing files are retained)
+   - Charts appear immediately with automatic scaling
+
+3. **View results**: Each chart displays one metric with bars for each loaded file
+   - Colors automatically assigned to distinguish files
+   - Hover over bars for exact values
+   - Orange warning badges indicate when comparing different machines
+
+### Managing Files
+
+- **Reorder**: Drag files to change chart ordering (charts update in real-time)
+- **Remove**: Click the remove button on individual files to exclude them from analysis
+- **Clear all**: Start fresh by removing all files at once
+
+### Example Workflows
+
+#### Trend Analysis
+Track performance changes on a single machine over time:
+
+```bash
+# Run on Day 1
+cargo run --release -- --count 5 --json  # output_20260125_143022.json
+
+# ... a week later ...
+
+# Run on Day 8
+cargo run --release -- --count 5 --json  # output_20260201_090000.json
+
+# Load both in visualize.html to see performance trends
+```
+
+#### Cross-Platform Comparison
+Compare performance across Windows, Linux, and macOS:
+
+```bash
+# Run on each platform and collect results
+# Windows: output_20260125_100000.json
+# Linux:  output_20260125_101000.json
+# macOS:  output_20260125_102000.json
+
+# Load all in visualize.html
+# Notice orange warning badges for different machines
+# Compare CPU/memory/disk performance across platforms
+```
+
+#### Configuration Testing
+Benchmark different system configurations:
+
+```bash
+# Test with 4 threads
+cargo run --release -- --thread 4 --count 5 --json   # output_*_config1.json
+
+# Test with 8 threads
+cargo run --release -- --thread 8 --count 5 --json   # output_*_config2.json
+
+# Load both to see the performance impact of thread count
+```
+
+### Technical Details
+
+- **Chart Library**: Chart.js 4.4.0 (loaded from CDN)
+- **Colors**: Assigned from a predefined palette based on file load order
+- **Metadata**: Automatically extracted from JSON files (hostname, timestamp)
+- **Responsive Layout**: CSS Grid scales charts from 500px to available width
+- **No Installation**: Entire tool runs in the browser with no dependencies
+
+
+
+Releases are automatically built and published when a git tag is pushed with the format `v{version}` (e.g., `v0.2.1`, `v1.2.3`).
 
 To create a release:
 
 ```bash
 # Tag the current commit
-git tag v0.1.0
+git tag v0.2.1
 
 # Push the tag (this triggers the release workflow)
-git push origin v0.1.0
+git push origin v0.2.1
 ```
 
 The release workflow will:
-1. Build optimized binaries for Windows, Linux, and macOS
+1. Build optimized binaries for Windows (x86_64), Linux (x86_64), and macOS (x86_64 & Apple Silicon)
 2. Create a GitHub Release with the tag name
-3. Upload binary artifacts for each platform
+3. Bundle each binary with README.md, LICENSE, and visualize.html
+4. Upload ZIP archives for each platform (named with version suffix)
 
-### Available Artifacts
+### Available Release Artifacts
 
-After a release is published, the following binaries are available:
-- `hs-benchmark-suite-linux-x86_64` - Linux binary
-- `hs-benchmark-suite-windows-x86_64.exe` - Windows binary
-- `hs-benchmark-suite-macos-x86_64` - macOS Intel binary
-- `hs-benchmark-suite-macos-aarch64` - macOS Apple Silicon binary
+After a release is published (e.g., `v0.2.1`), the following are available for download:
+- `hs-benchmark-suite-linux-x86_64-v0.2.1.zip` - Linux binary + docs + visualization tool
+- `hs-benchmark-suite-windows-x86_64.exe-v0.2.1.zip` - Windows binary + docs + visualization tool
+- `hs-benchmark-suite-macos-x86_64-v0.2.1.zip` - macOS Intel binary + docs + visualization tool
+- `hs-benchmark-suite-macos-aarch64-v0.2.1.zip` - macOS Apple Silicon binary + docs + visualization tool
+
+Each ZIP includes:
+- Compiled binary (ready to run)
+- README.md (this file with full documentation)
+- LICENSE (MIT license)
+- visualize.html (interactive visualization tool)
 
 ## Dependencies
 
