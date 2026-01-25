@@ -133,7 +133,7 @@ mod tests {
     fn test_default_args() {
         let args = BenchmarkArgs::default();
         assert_eq!(args.scale, 1.0);
-        assert_eq!(args.count, 1);
+        assert_eq!(args.count, 3);
         assert_eq!(args.threads, 4);
         assert!(!args.csv);
         assert!(!args.json);
