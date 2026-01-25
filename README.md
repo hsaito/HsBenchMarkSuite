@@ -2,7 +2,7 @@
 
 A high-performance Rust benchmark suite for measuring CPU, memory, and disk performance.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **This benchmark suite provides runtime metrics and performance measurements for specific test scenarios.** The results do **not necessarily equate to actual system capability** or real-world performance for your specific use cases. These benchmarks:
 

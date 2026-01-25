@@ -1,6 +1,6 @@
 /// HsBenchMarkSuite - Rust Performance Benchmark Suite
 ///
-/// ⚠️ DISCLAIMER:
+/// DISCLAIMER:
 /// This benchmark suite provides runtime metrics for synthetic test scenarios.
 /// Results represent performance on specific algorithms (prime calculations, matrix operations, sequential I/O)
 /// and do NOT necessarily equate to actual system capability for real-world workloads.
@@ -45,14 +45,11 @@ fn main() {
     }
 
     // Display disclaimer
-    println!("╔════════════════════════════════════════════════════════════════╗");
-    println!("║  ⚠️  DISCLAIMER: Benchmark Results ≠ Actual System Capability  ║");
-    println!("║                                                                ║");
-    println!("║  These results reflect runtime metrics for SYNTHETIC test      ║");
-    println!("║  scenarios and do NOT necessarily equate to actual system      ║");
-    println!("║  capability for real-world workloads. Use as ONE of MANY       ║");
-    println!("║  data points, not as sole basis for system evaluation.         ║");
-    println!("╚════════════════════════════════════════════════════════════════╝\n");
+    println!("DISCLAIMER: Benchmark Results vs Actual System Capability");
+    println!("These results reflect runtime metrics for synthetic test scenarios");
+    println!("and do NOT necessarily equate to actual system capability for");
+    println!("real-world workloads. Use these results as one of many data points,");
+    println!("not as the sole basis for system evaluation.\n");
 
     // Capture system information
     let system_info = SystemInfo::capture();
