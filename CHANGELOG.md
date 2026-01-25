@@ -5,6 +5,21 @@ All notable changes to HsBenchMarkSuite are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-01-25
+
+### Added
+
+- **Enhanced Documentation**
+  - Reorganized README.md with separate "Data Export and Visualization" section
+  - Added dedicated "Using the HTML Visualization Tool" section with detailed usage instructions
+  - Comprehensive example workflows for trend analysis, cross-platform comparison, and configuration testing
+  - Technical details about Chart.js integration and responsive design
+
+### Changed
+
+- **Release Artifact Naming**: ZIP files now use version suffix format (e.g., `hs-benchmark-suite-linux-x86_64-v0.2.1.zip`)
+- **Release Contents**: All release ZIPs now include README.md, LICENSE, and visualize.html alongside binaries
+
 ## [0.2.0] - 2026-01-25
 
 ### Added

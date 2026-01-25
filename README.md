@@ -394,16 +394,16 @@ cargo run --release -- --thread 8 --count 5 --json   # output_*_config2.json
 
 
 
-Releases are automatically built and published when a git tag is pushed with the format `v{version}` (e.g., `v0.2.0`, `v1.2.3`).
+Releases are automatically built and published when a git tag is pushed with the format `v{version}` (e.g., `v0.2.1`, `v1.2.3`).
 
 To create a release:
 
 ```bash
 # Tag the current commit
-git tag v0.2.0
+git tag v0.2.1
 
 # Push the tag (this triggers the release workflow)
-git push origin v0.2.0
+git push origin v0.2.1
 ```
 
 The release workflow will:
@@ -414,11 +414,11 @@ The release workflow will:
 
 ### Available Release Artifacts
 
-After a release is published (e.g., `v0.2.0`), the following are available for download:
-- `hs-benchmark-suite-linux-x86_64-v0.2.0.zip` - Linux binary + docs + visualization tool
-- `hs-benchmark-suite-windows-x86_64.exe-v0.2.0.zip` - Windows binary + docs + visualization tool
-- `hs-benchmark-suite-macos-x86_64-v0.2.0.zip` - macOS Intel binary + docs + visualization tool
-- `hs-benchmark-suite-macos-aarch64-v0.2.0.zip` - macOS Apple Silicon binary + docs + visualization tool
+After a release is published (e.g., `v0.2.1`), the following are available for download:
+- `hs-benchmark-suite-linux-x86_64-v0.2.1.zip` - Linux binary + docs + visualization tool
+- `hs-benchmark-suite-windows-x86_64.exe-v0.2.1.zip` - Windows binary + docs + visualization tool
+- `hs-benchmark-suite-macos-x86_64-v0.2.1.zip` - macOS Intel binary + docs + visualization tool
+- `hs-benchmark-suite-macos-aarch64-v0.2.1.zip` - macOS Apple Silicon binary + docs + visualization tool
 
 Each ZIP includes:
 - Compiled binary (ready to run)
