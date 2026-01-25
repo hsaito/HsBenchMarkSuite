@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-01-25
+
+### Fixed
+
+- **Mandelbrot & FFT Benchmarks**: Fixed timing threshold issue causing artificially identical measurements
+  - Increased minimum timing threshold from 1ms to 10ms for more accurate measurements
+  - Increased max_rounds from 256 to 65,536 to allow proper scaling for fast operations
+  - Resolves issue where all benchmark runs would produce identical results with 0% standard deviation
+  - Ensures benchmarks can properly measure variance and produce statistically meaningful results
+  - Affects both `benchmark_mandelbrot()` and `benchmark_fft()` functions
+
 ## [0.2.2] - 2026-01-25
 
 ### Added

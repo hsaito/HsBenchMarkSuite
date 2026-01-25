@@ -130,6 +130,16 @@ All benchmarks now include a warmup iteration before timing to:
 - Stabilize disk caches
 - Ensure consistent results across runs
 
+### Benchmark Timing Accuracy
+
+CPU benchmarks (Mandelbrot and FFT) use adaptive timing loops to ensure measurement accuracy:
+- **Minimum timing threshold**: 10ms (increased from 1ms in v0.2.3)
+- **Adaptive round scaling**: Automatically increases workload iterations until timing is measurable
+- **Maximum rounds**: Up to 65,536 iterations to accommodate fast operations
+- **Result**: Ensures statistically meaningful variance across benchmark runs (non-zero standard deviation)
+
+This approach prevents artificially identical measurements that can occur when operations complete faster than the system timer's precision.
+
 ## Benchmarks
 
 ### CPU Benchmark (Multiple calculations)

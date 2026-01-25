@@ -114,8 +114,8 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
         }
         elapsed = start.elapsed().as_secs_f64();
 
-        // If elapsed time is less than 1ms, double rounds and try again
-        if elapsed < 0.001 && rounds < 256 {
+        // If elapsed time is less than 10ms, double rounds and try again
+        if elapsed < 0.01 && rounds < 65536 {
             rounds *= 2;
         } else {
             break;
@@ -123,7 +123,7 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
     }
 
     if elapsed == 0.0 {
-        elapsed = 0.001;
+        elapsed = 0.01;
     }
 
     let total_pixels = (width * height) as f64 * (rounds as f64);
@@ -191,7 +191,7 @@ fn benchmark_fft(scale: f64) -> f64 {
         }
         elapsed = start.elapsed().as_secs_f64();
 
-        if elapsed < 0.001 && rounds < 256 {
+        if elapsed < 0.01 && rounds < 65536 {
             rounds *= 2;
         } else {
             break;
@@ -199,7 +199,7 @@ fn benchmark_fft(scale: f64) -> f64 {
     }
 
     if elapsed == 0.0 {
-        elapsed = 0.001;
+        elapsed = 0.01;
     }
 
     let total_samples = (size as f64) * (rounds as f64) / 1_000_000.0;
