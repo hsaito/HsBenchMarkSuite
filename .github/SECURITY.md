@@ -37,3 +37,9 @@ We appreciate responsible disclosure. If you would like recognition, let us know
 ## Dependencies
 
 We rely on automated updates (e.g., Dependabot) for third‑party dependencies. If the issue is in a dependency, please reference the upstream advisory or issue when reporting.
+
+## Automated Security Testing
+
+- Dependency vulnerability scanning via `cargo audit` in CI to flag known issues in Rust crates.
+- GitHub Dependabot monitors Rust dependencies and GitHub Actions and opens upgrade PRs when advisories are published.
+- Additional security tooling (e.g., SAST or license checks) may be added as the project grows and resources allow.

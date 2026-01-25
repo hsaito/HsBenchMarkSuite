@@ -43,6 +43,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Ensure tag is on main
+        shell: bash
+        run: |
+          git fetch origin main
+          # Verify the tagged commit is reachable from main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "Release tags must point to commits on main."
+            exit 1
+          fi
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
