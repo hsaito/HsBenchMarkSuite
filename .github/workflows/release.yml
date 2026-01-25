@@ -92,19 +92,21 @@ jobs:
       - name: Create ZIP archive
         shell: bash
         run: |
+          VERSION=${{ github.ref_name }}
+          ZIP_NAME="${{ matrix.asset_name }}-${VERSION}.zip"
           cd release
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # Use PowerShell to create ZIP on Windows
-            powershell -Command "Compress-Archive -Path '${{ matrix.asset_name }}', 'README.md', 'LICENSE', 'visualize.html' -DestinationPath '${{ matrix.asset_name }}.zip'"
+            powershell -Command "Compress-Archive -Path '${{ matrix.asset_name }}', 'README.md', 'LICENSE', 'visualize.html' -DestinationPath '$ZIP_NAME'"
           else
             # Use zip command on Unix-like systems
-            zip "${{ matrix.asset_name }}.zip" "${{ matrix.asset_name }}" README.md LICENSE visualize.html
+            zip "$ZIP_NAME" "${{ matrix.asset_name }}" README.md LICENSE visualize.html
           fi
           cd ..
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/${{ matrix.asset_name }}.zip
+          files: release/${{ matrix.asset_name }}-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
