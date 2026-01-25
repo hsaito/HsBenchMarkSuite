@@ -589,10 +589,11 @@
                 const values = [];
                 loadedData.forEach((item, idx) => {
                     const val = getMetricValue(item.data, metric);
-                    values.push(val !== null ? val : 0);
+                    values.push(val);
                 });
 
-                if (values.every(v => v === 0)) return;
+                // Skip only if ALL values are 0 AND we have at least one loaded file
+                if (loadedData.length > 0 && values.every(v => v === 0)) return;
 
                 const canvas = document.createElement('canvas');
                 chartDiv.appendChild(canvas);
@@ -650,11 +651,13 @@
             if (data.results) {
                 for (const category in data.results) {
                     if (data.results[category][metricName]) {
-                        return data.results[category][metricName].statistics?.mean || 0;
+                        const mean = data.results[category][metricName].statistics?.mean;
+                        // Ensure we return a valid number, not null or undefined
+                        return (mean !== null && mean !== undefined && !isNaN(mean)) ? mean : 0;
                     }
                 }
             }
-            return null;
+            return 0;
         }
 
         function clearData() {

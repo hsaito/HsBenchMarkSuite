@@ -5,6 +5,14 @@ All notable changes to HsBenchMarkSuite are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **HTML Visualization Tool**: Fixed issue where metric bars could fail to render when metric values were missing or malformed in loaded JSON files
+  - Improved null/undefined value handling in metric extraction
+  - Ensures all metric values are valid numbers with fallback to 0
+
 ## [0.2.1] - 2026-01-25
 
 ### Added
