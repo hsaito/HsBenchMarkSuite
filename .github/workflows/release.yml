@@ -85,6 +85,9 @@ jobs:
           
           mkdir -p release
           cp "$BINARY_PATH" "release/${{ matrix.asset_name }}"
+          cp README.md release/
+          cp LICENSE release/
+          cp visualize.html release/
 
       - name: Create ZIP archive
         shell: bash
@@ -92,10 +95,10 @@ jobs:
           cd release
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # Use PowerShell to create ZIP on Windows
-            powershell -Command "Compress-Archive -Path '${{ matrix.asset_name }}' -DestinationPath '${{ matrix.asset_name }}.zip'"
+            powershell -Command "Compress-Archive -Path '${{ matrix.asset_name }}', 'README.md', 'LICENSE', 'visualize.html' -DestinationPath '${{ matrix.asset_name }}.zip'"
           else
             # Use zip command on Unix-like systems
-            zip "${{ matrix.asset_name }}.zip" "${{ matrix.asset_name }}"
+            zip "${{ matrix.asset_name }}.zip" "${{ matrix.asset_name }}" README.md LICENSE visualize.html
           fi
           cd ..
 
