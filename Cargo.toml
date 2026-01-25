@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sysinfo = "0.37"
+sysinfo = "0.38"
 libc = "0.2"
 
 [[bin]]
