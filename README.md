@@ -2,6 +2,18 @@
 
 A high-performance Rust benchmark suite for measuring CPU, memory, and disk performance.
 
+## ⚠️ Disclaimer
+
+**This benchmark suite provides runtime metrics and performance measurements for specific test scenarios.** The results do **not necessarily equate to actual system capability** or real-world performance for your specific use cases. These benchmarks:
+
+- Measure synthetic workloads under controlled conditions
+- Test specific algorithms and data patterns (prime calculation, matrix multiplication, sequential I/O)
+- Do not account for complex real-world scenarios, caching effects, kernel scheduling, or system load
+- Reflect a single point-in-time snapshot of system performance
+- Should not be used as the sole factor in system purchasing or deployment decisions
+
+Use these results as **one of many data points** to understand your system's characteristics, not as definitive measures of overall capability or suitability for production workloads.
+
 ## Project Structure
 
 ```
