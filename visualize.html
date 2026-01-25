@@ -136,6 +136,19 @@
             background: white;
             border-radius: 4px;
             border: 1px solid #ddd;
+            cursor: move;
+            user-select: none;
+        }
+        
+        .file-item.dragging {
+            opacity: 0.5;
+            background: #f0f0f0;
+        }
+        
+        .file-item.dragover {
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            transform: scale(1.02);
         }
         
         .file-meta {
@@ -259,6 +272,42 @@
             background: #e8eaf6;
             border-color: #764ba2;
         }
+        
+        .hostname-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+        }
+        
+        .hostname-header.warning {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        
+        .hostname-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #2196F3;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .hostname-badge.warning {
+            background: #ff9800;
+        }
+        
+        .hostname-info {
+            font-size: 0.95em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -359,7 +408,7 @@
 
             let html = '<div class="file-list"><h3>Loaded Files (' + loadedData.length + ')</h3>';
             loadedData.forEach((item, idx) => {
-                html += `<div class="file-item">
+                html += `<div class="file-item" draggable="true" data-index="${idx}">
                     <div>
                         <strong>${item.name}</strong>
                         <div class="file-meta">Host: ${item.hostname} | Time: ${new Date(item.timestamp).toLocaleString()}</div>
@@ -369,6 +418,55 @@
             });
             html += '</div>';
             fileListDiv.innerHTML = html;
+            
+            // Attach drag event listeners
+            attachDragListeners();
+        }
+        
+        let draggedIndex = null;
+        
+        function attachDragListeners() {
+            const fileItems = document.querySelectorAll('.file-item');
+            
+            fileItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    draggedIndex = parseInt(e.currentTarget.getAttribute('data-index'));
+                    e.currentTarget.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', (e) => {
+                    e.currentTarget.classList.remove('dragging');
+                    document.querySelectorAll('.file-item').forEach(el => el.classList.remove('dragover'));
+                });
+                
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.add('dragover');
+                });
+                
+                item.addEventListener('dragleave', (e) => {
+                    e.currentTarget.classList.remove('dragover');
+                });
+                
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const targetIndex = parseInt(e.currentTarget.getAttribute('data-index'));
+                    
+                    if (draggedIndex !== null && draggedIndex !== targetIndex) {
+                        // Reorder loadedData array
+                        const draggedItem = loadedData[draggedIndex];
+                        loadedData.splice(draggedIndex, 1);
+                        loadedData.splice(targetIndex, 0, draggedItem);
+                        
+                        // Re-render and update charts
+                        renderFileList();
+                        updateMetricSelect();
+                        loadFiles(); // Regenerate charts with new order
+                    }
+                    
+                    e.currentTarget.classList.remove('dragover');
+                });
+            });
         }
 
         function removeFile(idx) {
@@ -450,6 +548,26 @@
         function renderComparisonView(container) {
             const selectedMetric = document.getElementById('metricSelect').value;
             const metrics = selectedMetric ? [selectedMetric] : getAllMetrics();
+
+            // Check if there are different hostnames
+            const uniqueHostnames = new Set(loadedData.map(d => d.hostname));
+            const hasMultipleHostnames = uniqueHostnames.size > 1;
+            
+            // Add hostname header if comparing different machines
+            if (hasMultipleHostnames) {
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'hostname-header warning';
+                
+                let headerHTML = '<div class="hostname-info">⚠️ Comparing data from different machines:</div><div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">';
+                
+                Array.from(uniqueHostnames).forEach(hostname => {
+                    headerHTML += `<span class="hostname-badge warning">${hostname}</span>`;
+                });
+                
+                headerHTML += '</div>';
+                headerDiv.innerHTML = headerHTML;
+                container.appendChild(headerDiv);
+            }
 
             // Create a grid container for all charts
             const chartsGrid = document.createElement('div');
