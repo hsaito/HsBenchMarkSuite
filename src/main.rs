@@ -1,10 +1,10 @@
 mod args;
+mod board_game;
 mod cpu;
 mod disk;
 mod memory;
 mod stats;
 mod sysinfo_capture;
-mod board_game;
 
 use args::BenchmarkArgs;
 use cpu::CpuResult;
