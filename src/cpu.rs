@@ -464,7 +464,8 @@ mod tests {
 
     #[test]
     fn test_cpu_benchmark_returns_valid() {
-        let result = run_cpu_benchmark();
+        // Use lightweight scale for CI/testing - avoids prolonged execution
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         assert!(
             result.primes_per_sec > 0.0,
             "Primes per second should be positive"
@@ -493,8 +494,9 @@ mod tests {
 
     #[test]
     fn test_cpu_benchmark_consistency() {
-        let result1 = run_cpu_benchmark();
-        let result2 = run_cpu_benchmark();
+        // Use lightweight scale for CI/testing
+        let result1 = run_cpu_benchmark_scaled(0.1, 2);
+        let result2 = run_cpu_benchmark_scaled(0.1, 2);
 
         // Primes count should be reasonably consistent
         // Allow higher variance (100%) to avoid flaky tests across different systems
@@ -534,7 +536,8 @@ mod tests {
 
     #[test]
     fn test_cpu_benchmark_default() {
-        let result = run_cpu_benchmark();
+        // Use lightweight scale for CI/testing
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         assert!(result.primes_per_sec > 0.0);
     }
 

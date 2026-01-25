@@ -278,7 +278,8 @@ mod tests {
 
     #[test]
     fn test_disk_benchmark() {
-        let result = run_disk_benchmark();
+        // Use lightweight scale for CI/testing - 5 MB instead of 50 MB
+        let result = run_disk_benchmark_scaled(0.1);
         assert!(
             result.combined_throughput > 0.0,
             "Disk benchmark should return positive throughput"
@@ -345,7 +346,8 @@ mod tests {
 
     #[test]
     fn test_disk_benchmark_reasonable_throughput() {
-        let result = run_disk_benchmark();
+        // Use lightweight scale for CI/testing
+        let result = run_disk_benchmark_scaled(0.1);
         // Throughput should be reasonable - at least 1 MB/s on most systems
         assert!(
             result.combined_throughput > 1.0,
@@ -382,7 +384,8 @@ mod tests {
 
     #[test]
     fn test_disk_benchmark_default() {
-        let result = run_disk_benchmark();
+        // Use lightweight scale for CI/testing
+        let result = run_disk_benchmark_scaled(0.1);
         assert!(result.write_throughput > 0.0);
         assert!(result.read_throughput > 0.0);
         assert!(result.combined_throughput > 0.0);

@@ -140,7 +140,8 @@ mod tests {
 
     #[test]
     fn test_memory_benchmark() {
-        let result = run_memory_benchmark();
+        // Use lightweight scale for CI/testing - 50 MB instead of 512 MB per thread
+        let result = run_memory_benchmark_scaled(0.1);
         assert!(
             result.combined_throughput > 0.0,
             "Memory benchmark should return positive throughput"
@@ -149,7 +150,8 @@ mod tests {
 
     #[test]
     fn test_memory_benchmark_reasonable_throughput() {
-        let result = run_memory_benchmark();
+        // Use lightweight scale for CI/testing
+        let result = run_memory_benchmark_scaled(0.1);
         // Throughput should be reasonable - at least 100 MB/s on most systems
         // This is a loose check to avoid flaky tests
         assert!(
