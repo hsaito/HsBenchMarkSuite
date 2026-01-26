@@ -89,7 +89,7 @@ fn main() {
             cpu_result.parallel_matrix_gflops
         );
         println!(
-            "CPU Speedup (ST->MT):   {:.2}x",
+            "CPU Speedup (ST->MT):    {:.2}x",
             cpu_result.parallel_speedup
         );
         println!(
@@ -146,7 +146,7 @@ fn main() {
                 "    Matrix Mult (MT):    {:.2} GFLOPS",
                 result.parallel_matrix_gflops
             );
-            println!("    Speedup (ST->MT):   {:.2}x", result.parallel_speedup);
+            println!("    Speedup (ST->MT):    {:.2}x", result.parallel_speedup);
             println!(
                 "    Mandelbrot:          {:.0} pixels/sec",
                 result.mandelbrot_pixels_per_sec
@@ -188,7 +188,7 @@ fn main() {
         println!("    Primes:              {:.0} primes/sec", cpu_primes_avg);
         println!("    Matrix Mult (ST):    {:.2} GFLOPS", cpu_matrix_avg);
         println!("    Matrix Mult (MT):    {:.2} GFLOPS", cpu_parallel_avg);
-        println!("    Speedup (ST->MT):   {:.2}x", cpu_speedup_avg);
+        println!("    Speedup (ST->MT):    {:.2}x", cpu_speedup_avg);
         println!(
             "    Mandelbrot:          {:.0} pixels/sec",
             cpu_mandelbrot_avg
