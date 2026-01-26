@@ -559,7 +559,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_speedup: Vec<f64> = results.cpu.iter().map(|r| r.parallel_speedup).collect();
-    writeln!(file, r#"      "cpu_parallel_speedup_mt": {{"#)?;
+    writeln!(file, r#"      "cpu_parallel_speedup": {{"#)?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,

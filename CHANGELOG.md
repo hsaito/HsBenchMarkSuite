@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (Breaking)
 
 - **Metric Naming**: Switched thread markers and JSON keys to intent-based labels
-  - JSON keys: `cpu_matrix_mult_gflops_1t` → `cpu_matrix_mult_gflops_st`, `cpu_matrix_mult_gflops_{threads}t` → `cpu_matrix_mult_gflops_mt`, `cpu_parallel_speedup_{threads}t` → `cpu_parallel_speedup_mt`
+  - JSON keys: `cpu_matrix_mult_gflops_1t` → `cpu_matrix_mult_gflops_st`, `cpu_matrix_mult_gflops_{threads}t` → `cpu_matrix_mult_gflops_mt`, `cpu_parallel_speedup_{threads}t` → `cpu_parallel_speedup`
   - CSV headers and console output now use `ST` (single-threaded) and `MT` (multi-threaded)
   - Speedup label updated to `Speedup (ST->MT)` to explicitly indicate the comparison
   - Rationale: Avoid confusion when configured threads are not 4 and standardize labels across outputs
