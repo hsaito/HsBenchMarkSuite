@@ -523,8 +523,11 @@ mod tests {
 
     #[test]
     fn test_mandelbrot_calculation() {
-        let pixels = calculate_mandelbrot(64, 64, 100);
-        assert_eq!(pixels, 64 * 64, "Should calculate all pixels");
+        let iter_sum = calculate_mandelbrot(64, 64, 100);
+        // Should return iteration sum, not pixel count
+        // Iteration sum should be > 0 and typically > pixel count
+        assert!(iter_sum > 0, "Iteration sum should be positive");
+        assert!(iter_sum >= 64 * 64, "Iteration sum should be at least equal to pixel count");
     }
 
     #[test]
@@ -580,9 +583,15 @@ mod tests {
 
     #[test]
     fn test_mandelbrot_different_sizes() {
-        let pixels1 = calculate_mandelbrot(10, 10, 50);
-        let pixels2 = calculate_mandelbrot(20, 20, 50);
-        assert_eq!(pixels1, 100);
-        assert_eq!(pixels2, 400);
+        let iter_sum1 = calculate_mandelbrot(10, 10, 50);
+        let iter_sum2 = calculate_mandelbrot(20, 20, 50);
+        // Iteration sums should be positive
+        assert!(iter_sum1 > 0, "Iteration sum should be positive");
+        assert!(iter_sum2 > 0, "Iteration sum should be positive");
+        // Larger size should generally have larger iteration sum
+        assert!(iter_sum2 > iter_sum1, "Larger grid should have more iterations");
+        // Should be at least the pixel counts
+        assert!(iter_sum1 >= 100);
+        assert!(iter_sum2 >= 400);
     }
 }
