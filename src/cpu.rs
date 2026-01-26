@@ -527,7 +527,10 @@ mod tests {
         // Should return iteration sum, not pixel count
         // Iteration sum should be > 0 and typically > pixel count
         assert!(iter_sum > 0, "Iteration sum should be positive");
-        assert!(iter_sum >= 64 * 64, "Iteration sum should be at least equal to pixel count");
+        assert!(
+            iter_sum >= 64 * 64,
+            "Iteration sum should be at least equal to pixel count"
+        );
     }
 
     #[test]
@@ -589,7 +592,10 @@ mod tests {
         assert!(iter_sum1 > 0, "Iteration sum should be positive");
         assert!(iter_sum2 > 0, "Iteration sum should be positive");
         // Larger size should generally have larger iteration sum
-        assert!(iter_sum2 > iter_sum1, "Larger grid should have more iterations");
+        assert!(
+            iter_sum2 > iter_sum1,
+            "Larger grid should have more iterations"
+        );
         // Should be at least the pixel counts
         assert!(iter_sum1 >= 100);
         assert!(iter_sum2 >= 400);
