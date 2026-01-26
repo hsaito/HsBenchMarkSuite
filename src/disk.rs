@@ -399,7 +399,8 @@ mod tests {
 
     #[test]
     fn test_disk_benchmark_scaled() {
-        let result = run_disk_benchmark_scaled(0.5);
+        // Use lightweight scale for CI/testing
+        let result = run_disk_benchmark_scaled(0.1);
         assert!(result.write_throughput > 0.0);
         assert!(result.read_throughput > 0.0);
         assert!(result.combined_throughput > 0.0);
@@ -416,7 +417,8 @@ mod tests {
 
     #[test]
     fn test_disk_combined_calculation() {
-        let result = run_disk_benchmark_scaled(0.3);
+        // Use lightweight scale for CI/testing
+        let result = run_disk_benchmark_scaled(0.1);
         // Combined throughput should be reasonable
         assert!(result.combined_throughput > 0.0);
         // Combined should not exceed sum of read and write
@@ -435,7 +437,8 @@ mod tests {
     #[test]
     fn test_disk_cleanup_on_completion() {
         use std::path::Path;
-        run_disk_benchmark_scaled(0.2);
+        // Use lightweight scale for CI/testing
+        run_disk_benchmark_scaled(0.1);
         // Give filesystem time to complete cleanup
         std::thread::sleep(std::time::Duration::from_millis(100));
         // Verify test file and directory are cleaned up

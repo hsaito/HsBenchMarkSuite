@@ -136,9 +136,12 @@ CPU benchmarks (Mandelbrot and FFT) use adaptive timing loops to ensure measurem
 - **Minimum timing threshold**: 10ms (increased from 1ms in v0.2.3)
 - **Adaptive round scaling**: Automatically increases workload iterations until timing is measurable
 - **Maximum rounds**: Up to 65,536 iterations to accommodate fast operations
-- **Result**: Ensures statistically meaningful variance across benchmark runs (non-zero standard deviation)
+- **Compiler optimization protection**: Uses `std::hint::black_box()` to prevent dead code elimination in release builds
+- **Result checksum**: Accumulates computation results to ensure all calculations are actually performed
 
-This approach prevents artificially identical measurements that can occur when operations complete faster than the system timer's precision.
+This approach prevents:
+- Artificially identical measurements when operations complete faster than timer precision
+- Compiler optimizations that eliminate "unused" calculations in release builds (which caused absurdly high results in v0.2.3)
 
 ## Benchmarks
 

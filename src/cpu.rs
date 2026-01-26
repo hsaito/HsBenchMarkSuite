@@ -106,11 +106,13 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
 
     let mut rounds = 1;
     let mut elapsed;
+    let mut checksum = 0u64; // Prevent compiler from optimizing away the calculation
 
     loop {
         let start = Instant::now();
         for _ in 0..rounds {
-            let _ = calculate_mandelbrot(width, height, max_iter);
+            let result = calculate_mandelbrot(width, height, max_iter);
+            checksum = checksum.wrapping_add(std::hint::black_box(result));
         }
         elapsed = start.elapsed().as_secs_f64();
 
@@ -126,14 +128,17 @@ fn benchmark_mandelbrot(scale: f64) -> f64 {
         elapsed = 0.01;
     }
 
+    // Force compiler to keep checksum (prevents dead code elimination)
+    std::hint::black_box(checksum);
+
     let total_pixels = (width * height) as f64 * (rounds as f64);
     total_pixels / elapsed
 }
 
 /// Calculate Mandelbrot set for given resolution
-/// Returns: number of pixels calculated
+/// Returns: iteration count sum (used as checksum to prevent optimization)
 fn calculate_mandelbrot(width: usize, height: usize, max_iter: u32) -> u64 {
-    let mut count = 0u64;
+    let mut iter_sum = 0u64;
 
     for y in 0..height {
         for x in 0..width {
@@ -159,11 +164,11 @@ fn calculate_mandelbrot(width: usize, height: usize, max_iter: u32) -> u64 {
                 iter += 1;
             }
 
-            count += 1;
+            iter_sum = iter_sum.wrapping_add(iter as u64);
         }
     }
 
-    count
+    iter_sum
 }
 
 /// Benchmark Fast Fourier Transform
@@ -182,12 +187,16 @@ fn benchmark_fft(scale: f64) -> f64 {
 
     let mut rounds = 1;
     let mut elapsed;
+    let mut checksum = 0.0f64; // Prevent compiler from optimizing away the calculation
 
     loop {
         let start = Instant::now();
         for _ in 0..rounds {
             let mut data = input.clone();
             cooley_tukey_fft(&mut data);
+            // Use first element as checksum
+            let result = data[0].0 + data[0].1;
+            checksum += std::hint::black_box(result);
         }
         elapsed = start.elapsed().as_secs_f64();
 
@@ -201,6 +210,9 @@ fn benchmark_fft(scale: f64) -> f64 {
     if elapsed == 0.0 {
         elapsed = 0.01;
     }
+
+    // Force compiler to keep checksum (prevents dead code elimination)
+    std::hint::black_box(checksum);
 
     let total_samples = (size as f64) * (rounds as f64) / 1_000_000.0;
     total_samples / elapsed
@@ -511,8 +523,14 @@ mod tests {
 
     #[test]
     fn test_mandelbrot_calculation() {
-        let pixels = calculate_mandelbrot(64, 64, 100);
-        assert_eq!(pixels, 64 * 64, "Should calculate all pixels");
+        let iter_sum = calculate_mandelbrot(64, 64, 100);
+        // Should return iteration sum, not pixel count
+        // Iteration sum should be > 0 and typically > pixel count
+        assert!(iter_sum > 0, "Iteration sum should be positive");
+        assert!(
+            iter_sum >= 64 * 64,
+            "Iteration sum should be at least equal to pixel count"
+        );
     }
 
     #[test]
@@ -525,7 +543,8 @@ mod tests {
 
     #[test]
     fn test_cpu_benchmark_scaled() {
-        let result = run_cpu_benchmark_scaled(0.5, 2);
+        // Use lightweight scale for CI/testing
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         assert!(result.primes_per_sec > 0.0);
         assert!(result.matrix_mult_gflops > 0.0);
         assert!(result.parallel_matrix_gflops > 0.0);
@@ -552,7 +571,8 @@ mod tests {
 
     #[test]
     fn test_parallel_speedup_calculation() {
-        let result = run_cpu_benchmark_scaled(0.5, 4);
+        // Use lightweight scale for CI/testing
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         // Speedup should be positive (even if < 1 due to overhead)
         assert!(result.parallel_speedup > 0.0);
         // Speedup calculation should match
@@ -568,9 +588,18 @@ mod tests {
 
     #[test]
     fn test_mandelbrot_different_sizes() {
-        let pixels1 = calculate_mandelbrot(10, 10, 50);
-        let pixels2 = calculate_mandelbrot(20, 20, 50);
-        assert_eq!(pixels1, 100);
-        assert_eq!(pixels2, 400);
+        let iter_sum1 = calculate_mandelbrot(10, 10, 50);
+        let iter_sum2 = calculate_mandelbrot(20, 20, 50);
+        // Iteration sums should be positive
+        assert!(iter_sum1 > 0, "Iteration sum should be positive");
+        assert!(iter_sum2 > 0, "Iteration sum should be positive");
+        // Larger size should generally have larger iteration sum
+        assert!(
+            iter_sum2 > iter_sum1,
+            "Larger grid should have more iterations"
+        );
+        // Should be at least the pixel counts
+        assert!(iter_sum1 >= 100);
+        assert!(iter_sum2 >= 400);
     }
 }
