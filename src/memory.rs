@@ -206,7 +206,8 @@ mod tests {
 
     #[test]
     fn test_memory_benchmark_scaled() {
-        let result = run_memory_benchmark_scaled(0.5);
+        // Use lightweight scale for CI/testing
+        let result = run_memory_benchmark_scaled(0.1);
         assert!(result.write_throughput > 0.0);
         assert!(result.read_throughput > 0.0);
         assert!(result.combined_throughput > 0.0);
@@ -220,7 +221,8 @@ mod tests {
 
     #[test]
     fn test_memory_combined_calculation() {
-        let result = run_memory_benchmark_scaled(0.3);
+        // Use lightweight scale for CI/testing
+        let result = run_memory_benchmark_scaled(0.1);
         // Combined throughput should be reasonable relative to individual values
         assert!(result.combined_throughput > 0.0);
         // Combined should not exceed sum of read and write (that would be impossible)

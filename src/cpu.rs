@@ -543,7 +543,8 @@ mod tests {
 
     #[test]
     fn test_cpu_benchmark_scaled() {
-        let result = run_cpu_benchmark_scaled(0.5, 2);
+        // Use lightweight scale for CI/testing
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         assert!(result.primes_per_sec > 0.0);
         assert!(result.matrix_mult_gflops > 0.0);
         assert!(result.parallel_matrix_gflops > 0.0);
@@ -570,7 +571,8 @@ mod tests {
 
     #[test]
     fn test_parallel_speedup_calculation() {
-        let result = run_cpu_benchmark_scaled(0.5, 4);
+        // Use lightweight scale for CI/testing
+        let result = run_cpu_benchmark_scaled(0.1, 2);
         // Speedup should be positive (even if < 1 due to overhead)
         assert!(result.parallel_speedup > 0.0);
         // Speedup calculation should match
