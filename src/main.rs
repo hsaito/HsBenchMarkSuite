@@ -101,7 +101,7 @@ fn main() {
             cpu_result.fft_msamples_per_sec
         );
         results.cpu.push(cpu_result);
-        println!("Duration: {:?}\n", cpu_duration);
+        println!("{:<24}{:?}\n", "Duration:", cpu_duration);
 
         // Memory Benchmark
         println!("Running Memory Benchmark...");
@@ -112,7 +112,7 @@ fn main() {
         println!("Memory Read:  {:.2} MB/s", mem_result.read_throughput);
         println!("Memory Avg:   {:.2} MB/s", mem_result.combined_throughput);
         results.memory.push(mem_result);
-        println!("Duration: {:?}\n", mem_duration);
+        println!("{:<24}{:?}\n", "Duration:", mem_duration);
 
         // Disk Benchmark
         println!("Running Disk Benchmark...");
@@ -124,7 +124,7 @@ fn main() {
         println!("Disk Read:  {:.2} MB/s", disk_result.read_throughput);
         println!("Disk Avg:   {:.2} MB/s", disk_result.combined_throughput);
         results.disk.push(disk_result);
-        println!("Duration: {:?}\n", disk_duration);
+        println!("{:<24}{:?}\n", "Duration:", disk_duration);
     }
 
     // Display summary with averages if multiple runs
