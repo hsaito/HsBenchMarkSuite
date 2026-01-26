@@ -147,9 +147,9 @@ This approach prevents:
 
 ### CPU Benchmark (Multiple calculations)
 - **Prime Numbers**: Calculates primes and measures throughput (primes/sec)
-- **Matrix Multiplication (Single-threaded)**: 256×256 matrix operation (GFLOPS)
-- **Matrix Multiplication (Multi-threaded)**: Parallel matrix computation with configurable threads
-- **Parallel Speedup**: Ratio of multi-threaded to single-threaded performance
+- **Matrix Multiplication (Single-threaded - ST)**: 256×256 matrix operation (GFLOPS)
+- **Matrix Multiplication (Multi-threaded - MT)**: Parallel matrix computation using the configured thread count
+ - **Parallel Speedup (ST->MT)**: Ratio of multi-threaded to single-threaded performance
 - **Mandelbrot Set**: Fractal computation (pixels/sec)
 - **Fast Fourier Transform (FFT)**: Signal processing benchmark (Msamples/sec)
 
@@ -249,9 +249,9 @@ Threads: 4
 --- Run 1 ---
 Running CPU Benchmark...
 CPU Primes:              12500 primes/sec
-CPU Matrix Mult (1T):    2.45 GFLOPS
-CPU Matrix Mult (4T):    8.12 GFLOPS
-CPU Speedup (4T):        3.32x
+CPU Matrix Mult (ST):    2.45 GFLOPS
+CPU Matrix Mult (MT):    8.12 GFLOPS
+CPU Speedup (ST->MT):    3.32x
 CPU Mandelbrot:          2500000 pixels/sec
 CPU FFT:                 150 Msamples/sec
 Duration: 2.34s
@@ -274,7 +274,7 @@ Duration: 1.08s
 **CPU Metrics:**
 - **Primes/sec**: Higher is better. Measures raw computational throughput. Sensitive to CPU frequency and instruction-level parallelism.
 - **GFLOPS (Giga Floating-Point Operations/Second)**: Higher is better. Matrix multiplication performance; single-threaded vs multi-threaded shows parallelization efficiency.
-- **Speedup Ratio**: Shows how effectively your system uses multiple cores. A value close to the thread count indicates good scaling; lower values suggest memory bandwidth or lock contention.
+ - **Speedup (ST->MT)**: Shows how effectively your system uses multiple cores. Defined as MT GFLOPS / ST GFLOPS. A value close to the configured thread count indicates good scaling; lower values suggest memory bandwidth or lock contention.
 - **Pixels/sec (Mandelbrot)**: Higher is better. Complex number calculations; tests floating-point performance.
 - **Msamples/sec (FFT)**: Higher is better. Fast Fourier Transform throughput; sensitive to memory access patterns and cache efficiency.
 

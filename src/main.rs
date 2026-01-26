@@ -81,16 +81,16 @@ fn main() {
             cpu_result.primes_per_sec
         );
         println!(
-            "CPU Matrix Mult (1T):    {:.2} GFLOPS",
+            "CPU Matrix Mult (ST):    {:.2} GFLOPS",
             cpu_result.matrix_mult_gflops
         );
         println!(
-            "CPU Matrix Mult ({}T):    {:.2} GFLOPS",
-            cli_args.threads, cpu_result.parallel_matrix_gflops
+            "CPU Matrix Mult (MT):    {:.2} GFLOPS",
+            cpu_result.parallel_matrix_gflops
         );
         println!(
-            "CPU Speedup ({}T):        {:.2}x",
-            cli_args.threads, cpu_result.parallel_speedup
+            "CPU Speedup (ST->MT):    {:.2}x",
+            cpu_result.parallel_speedup
         );
         println!(
             "CPU Mandelbrot:          {:.0} pixels/sec",
@@ -101,7 +101,7 @@ fn main() {
             cpu_result.fft_msamples_per_sec
         );
         results.cpu.push(cpu_result);
-        println!("Duration: {:?}\n", cpu_duration);
+        println!("Duration:                {:?}\n", cpu_duration);
 
         // Memory Benchmark
         println!("Running Memory Benchmark...");
@@ -112,7 +112,7 @@ fn main() {
         println!("Memory Read:  {:.2} MB/s", mem_result.read_throughput);
         println!("Memory Avg:   {:.2} MB/s", mem_result.combined_throughput);
         results.memory.push(mem_result);
-        println!("Duration: {:?}\n", mem_duration);
+        println!("Duration:     {:?}\n", mem_duration);
 
         // Disk Benchmark
         println!("Running Disk Benchmark...");
@@ -124,7 +124,7 @@ fn main() {
         println!("Disk Read:  {:.2} MB/s", disk_result.read_throughput);
         println!("Disk Avg:   {:.2} MB/s", disk_result.combined_throughput);
         results.disk.push(disk_result);
-        println!("Duration: {:?}\n", disk_duration);
+        println!("Duration:   {:?}\n", disk_duration);
     }
 
     // Display summary with averages if multiple runs
@@ -139,17 +139,14 @@ fn main() {
                 result.primes_per_sec
             );
             println!(
-                "    Matrix Mult (1T):    {:.2} GFLOPS",
+                "    Matrix Mult (ST):    {:.2} GFLOPS",
                 result.matrix_mult_gflops
             );
             println!(
-                "    Matrix Mult ({}T):    {:.2} GFLOPS",
-                cli_args.threads, result.parallel_matrix_gflops
+                "    Matrix Mult (MT):    {:.2} GFLOPS",
+                result.parallel_matrix_gflops
             );
-            println!(
-                "    Speedup ({}T):        {:.2}x",
-                cli_args.threads, result.parallel_speedup
-            );
+            println!("    Speedup (ST->MT):    {:.2}x", result.parallel_speedup);
             println!(
                 "    Mandelbrot:          {:.0} pixels/sec",
                 result.mandelbrot_pixels_per_sec
@@ -189,15 +186,9 @@ fn main() {
             / results.cpu.len() as f64;
         println!("  Average:");
         println!("    Primes:              {:.0} primes/sec", cpu_primes_avg);
-        println!("    Matrix Mult (1T):    {:.2} GFLOPS", cpu_matrix_avg);
-        println!(
-            "    Matrix Mult ({}T):    {:.2} GFLOPS",
-            cli_args.threads, cpu_parallel_avg
-        );
-        println!(
-            "    Speedup ({}T):        {:.2}x",
-            cli_args.threads, cpu_speedup_avg
-        );
+        println!("    Matrix Mult (ST):    {:.2} GFLOPS", cpu_matrix_avg);
+        println!("    Matrix Mult (MT):    {:.2} GFLOPS", cpu_parallel_avg);
+        println!("    Speedup (ST->MT):    {:.2}x", cpu_speedup_avg);
         println!(
             "    Mandelbrot:          {:.0} pixels/sec",
             cpu_mandelbrot_avg
@@ -281,7 +272,7 @@ fn main() {
 }
 
 fn write_csv_report(
-    args: &BenchmarkArgs,
+    _args: &BenchmarkArgs,
     results: &BenchmarkResults,
     _system_info: &SystemInfo,
 ) -> std::io::Result<()> {
@@ -340,13 +331,13 @@ fn write_csv_report(
 
     write_metric(
         &mut file,
-        "CPU Matrix 1T (GFLOPS)",
+        "CPU Matrix ST (GFLOPS)",
         results.cpu.iter().map(|r| r.matrix_mult_gflops).collect(),
     )?;
 
     write_metric(
         &mut file,
-        &format!("CPU Matrix {}T (GFLOPS)", args.threads),
+        "CPU Matrix MT (GFLOPS)",
         results
             .cpu
             .iter()
@@ -356,7 +347,7 @@ fn write_csv_report(
 
     write_metric(
         &mut file,
-        &format!("CPU Speedup ({}T)", args.threads),
+        "CPU Speedup (ST->MT)",
         results.cpu.iter().map(|r| r.parallel_speedup).collect(),
     )?;
 
@@ -532,7 +523,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_matrix: Vec<f64> = results.cpu.iter().map(|r| r.matrix_mult_gflops).collect();
-    writeln!(file, r#"      "cpu_matrix_mult_gflops_1t": {{"#)?;
+    writeln!(file, r#"      "cpu_matrix_mult_gflops_st": {{"#)?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -550,11 +541,7 @@ fn write_json_report(
         .iter()
         .map(|r| r.parallel_matrix_gflops)
         .collect();
-    writeln!(
-        file,
-        r#"      "cpu_matrix_mult_gflops_{}t": {{"#,
-        args.threads
-    )?;
+    writeln!(file, r#"      "cpu_matrix_mult_gflops_mt": {{"#)?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,
@@ -572,11 +559,7 @@ fn write_json_report(
     writeln!(file, "      }},")?;
 
     let cpu_speedup: Vec<f64> = results.cpu.iter().map(|r| r.parallel_speedup).collect();
-    writeln!(
-        file,
-        r#"      "cpu_parallel_speedup_{}t": {{"#,
-        args.threads
-    )?;
+    writeln!(file, r#"      "cpu_parallel_speedup": {{"#)?;
     writeln!(
         file,
         r#"        "runs": [{}],"#,

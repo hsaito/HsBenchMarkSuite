@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-01-25
+
+### Changed (Breaking)
+
+- **Metric Naming**: Switched thread markers and JSON keys to intent-based labels
+  - JSON keys: `cpu_matrix_mult_gflops_1t` → `cpu_matrix_mult_gflops_st`, `cpu_matrix_mult_gflops_{threads}t` → `cpu_matrix_mult_gflops_mt`, `cpu_parallel_speedup_{threads}t` → `cpu_parallel_speedup`
+  - CSV headers and console output now use `ST` (single-threaded) and `MT` (multi-threaded)
+  - Speedup label updated to `Speedup (ST->MT)` to explicitly indicate the comparison
+  - Rationale: Avoid confusion when configured threads are not 4 and standardize labels across outputs
+
+### Documentation
+
+- README updated with ST/MT definitions and the speedup formula (MT GFLOPS / ST GFLOPS)
+
 ## [0.2.4] - 2026-01-25
 
 ### Fixed
@@ -19,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed `calculate_mandelbrot()` to return iteration sum instead of pixel count for meaningful checksums
   - Debug builds were unaffected; only release builds with `-O3` and LTO showed the problem
   - **Impact**: Release build results now accurately reflect actual computational work performed
+
+### Changed
+
+- Documentation improvements related to benchmark robustness and clarity
+  - Clarified adaptive timing thresholds and use of `std::hint::black_box()` in CPU benchmarks
+  - Ensures release builds produce accurate, variance-rich results
 
 ## [0.2.3] - 2026-01-25
 
