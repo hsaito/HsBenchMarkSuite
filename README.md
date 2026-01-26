@@ -147,8 +147,8 @@ This approach prevents:
 
 ### CPU Benchmark (Multiple calculations)
 - **Prime Numbers**: Calculates primes and measures throughput (primes/sec)
-- **Matrix Multiplication (Single-threaded)**: 256×256 matrix operation (GFLOPS)
-- **Matrix Multiplication (Multi-threaded)**: Parallel matrix computation with configurable threads
+- **Matrix Multiplication (Single-threaded - ST)**: 256×256 matrix operation (GFLOPS)
+- **Matrix Multiplication (Multi-threaded - MT)**: Parallel matrix computation using the configured thread count
 - **Parallel Speedup**: Ratio of multi-threaded to single-threaded performance
 - **Mandelbrot Set**: Fractal computation (pixels/sec)
 - **Fast Fourier Transform (FFT)**: Signal processing benchmark (Msamples/sec)
@@ -249,9 +249,9 @@ Threads: 4
 --- Run 1 ---
 Running CPU Benchmark...
 CPU Primes:              12500 primes/sec
-CPU Matrix Mult (1T):    2.45 GFLOPS
-CPU Matrix Mult (4T):    8.12 GFLOPS
-CPU Speedup (4T):        3.32x
+CPU Matrix Mult (ST):    2.45 GFLOPS
+CPU Matrix Mult (MT):    8.12 GFLOPS
+CPU Speedup (MT):        3.32x
 CPU Mandelbrot:          2500000 pixels/sec
 CPU FFT:                 150 Msamples/sec
 Duration: 2.34s

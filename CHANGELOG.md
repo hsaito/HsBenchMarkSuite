@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Debug builds were unaffected; only release builds with `-O3` and LTO showed the problem
   - **Impact**: Release build results now accurately reflect actual computational work performed
 
+### Changed
+
+- **Metric Naming**: Renamed thread markers from fixed counts to intent-based labels
+  - JSON keys: `cpu_matrix_mult_gflops_1t` → `cpu_matrix_mult_gflops_st`, `cpu_matrix_mult_gflops_{threads}t` → `cpu_matrix_mult_gflops_mt`, `cpu_parallel_speedup_{threads}t` → `cpu_parallel_speedup_mt`
+  - CSV headers and console output now use `ST` (single-threaded) and `MT` (multi-threaded)
+  - Clarifies that `MT` reflects the configured thread count, avoiding mismatches when threads are not 4
+
 ## [0.2.3] - 2026-01-25
 
 ### Fixed
