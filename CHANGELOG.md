@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-02-01
+
+### Added
+
+- CSV/JSON output and visualization enhancements from v0.3.0 now fully documented
+  - Timestamped output filenames (format: `output_YYYYMMDD_HHMMSS.{csv|json}`)
+  - Clean CSV output without comment lines for direct data import
+  - Interactive HTML visualization tool with multi-file comparison support
+  - Metadata tracking with hostname and RFC3339 timestamps
+
 ## [0.3.0] - 2026-01-25
 
 ### Changed (Breaking)
