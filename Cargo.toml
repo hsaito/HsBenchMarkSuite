@@ -4,7 +4,7 @@ version = "0.3.2"
 edition = "2021"
 
 [dependencies]
-sysinfo = "0.39"
+sysinfo = "0.40"
 libc = "0.2"
 chrono = "0.4"
 
